@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KesselRunFramework.Core\KesselRunFramework.Core.csproj" />
+    <ProjectReference Include="..\KesselRunFramework.DataAccess\KesselRunFramework.DataAccess.csproj" />
+  </ItemGroup>
+
+</Project>

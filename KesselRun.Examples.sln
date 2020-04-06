@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KesselRun.Web.Api", "KesselRun.Web.Api\KesselRun.Web.Api.csproj", "{6F0E5508-11DF-45D4-AEBC-BC08DE588E2E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KesselRunFramework.Core", "KesselRunFramework.Core\KesselRunFramework.Core.csproj", "{E6773E9F-9BDB-4B85-A3F2-D8958044FA2C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KesselRunFramework.DataAccess", "KesselRunFramework.DataAccess\KesselRunFramework.DataAccess.csproj", "{E5F16F88-B0D0-435A-AACF-48E64073BFA0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KesselRunFramework.AspNet", "KesselRunFramework.AspNet\KesselRunFramework.AspNet.csproj", "{6A3C3C5E-7A60-4FE7-B106-33F8C7EE1EAD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KesselRun.Business", "KesselRun.Business\KesselRun.Business.csproj", "{94CB80BB-930E-45E0-AE24-842E9C0635D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{91A3F9AD-E9B4-40BD-B916-C32EE6C9C3E4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{C303B5E6-8C2A-4ACE-9688-BD2441F6A650}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "View", "View", "{27598526-C352-46BF-A4D9-04D966489A16}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F0E5508-11DF-45D4-AEBC-BC08DE588E2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F0E5508-11DF-45D4-AEBC-BC08DE588E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F0E5508-11DF-45D4-AEBC-BC08DE588E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F0E5508-11DF-45D4-AEBC-BC08DE588E2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6773E9F-9BDB-4B85-A3F2-D8958044FA2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6773E9F-9BDB-4B85-A3F2-D8958044FA2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6773E9F-9BDB-4B85-A3F2-D8958044FA2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6773E9F-9BDB-4B85-A3F2-D8958044FA2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5F16F88-B0D0-435A-AACF-48E64073BFA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5F16F88-B0D0-435A-AACF-48E64073BFA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5F16F88-B0D0-435A-AACF-48E64073BFA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5F16F88-B0D0-435A-AACF-48E64073BFA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A3C3C5E-7A60-4FE7-B106-33F8C7EE1EAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A3C3C5E-7A60-4FE7-B106-33F8C7EE1EAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A3C3C5E-7A60-4FE7-B106-33F8C7EE1EAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A3C3C5E-7A60-4FE7-B106-33F8C7EE1EAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94CB80BB-930E-45E0-AE24-842E9C0635D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94CB80BB-930E-45E0-AE24-842E9C0635D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94CB80BB-930E-45E0-AE24-842E9C0635D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94CB80BB-930E-45E0-AE24-842E9C0635D9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6F0E5508-11DF-45D4-AEBC-BC08DE588E2E} = {27598526-C352-46BF-A4D9-04D966489A16}
+		{E6773E9F-9BDB-4B85-A3F2-D8958044FA2C} = {91A3F9AD-E9B4-40BD-B916-C32EE6C9C3E4}
+		{E5F16F88-B0D0-435A-AACF-48E64073BFA0} = {C303B5E6-8C2A-4ACE-9688-BD2441F6A650}
+		{6A3C3C5E-7A60-4FE7-B106-33F8C7EE1EAD} = {27598526-C352-46BF-A4D9-04D966489A16}
+		{94CB80BB-930E-45E0-AE24-842E9C0635D9} = {91A3F9AD-E9B4-40BD-B916-C32EE6C9C3E4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {52A53FA9-34C0-4E8F-8CD7-3A7B49047566}
+	EndGlobalSection
+EndGlobal
