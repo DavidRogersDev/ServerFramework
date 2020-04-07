@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="8.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\KesselRunFramework.Core\KesselRunFramework.Core.csproj" />
     <ProjectReference Include="..\KesselRunFramework.DataAccess\KesselRunFramework.DataAccess.csproj" />
   </ItemGroup>
