@@ -47,10 +47,10 @@ namespace KesselRunFramework.AspNet.Messaging.Pipelines
                 if (responseType.IsGenericType)
                 {
                     var resultType = responseType.GetGenericArguments()[0];
-                    var inValidResponse = typeof(ValidateableResponse<>).MakeGenericType(resultType);
+                    var invalidResponseType = typeof(ValidateableResponse<>).MakeGenericType(resultType);
 
                     var invalidResponse =
-                        Activator.CreateInstance(inValidResponse, null, result.Errors.Select(s => s.ErrorMessage).ToList()) as TResponse;
+                        Activator.CreateInstance(invalidResponseType, null, result.Errors.Select(s => s.ErrorMessage).ToList()) as TResponse;
 
                     return invalidResponse;
                 }
