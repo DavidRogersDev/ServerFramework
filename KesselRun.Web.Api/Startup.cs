@@ -87,10 +87,11 @@ namespace KesselRun.Web.Api
         private void RegisterApplicationServices()
         {
             var assemblies = GetAssemblies();
-            
+
             Container.RegisterValidationAbstractions(new[] { assemblies[StartUp.Executing], assemblies[StartUp.Domain] });
             Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(assemblies));
             Container.RegisterMediatRAbstractions(new []{ assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
+            Container.RegisterApplicationServices(assemblies[StartUp.Domain], Configuration, "KesselRun.Business.ApplicationServices");
         }
 
         private static Type[] GetTypesForPipeline(IWebHostEnvironment webHostEnvironment)

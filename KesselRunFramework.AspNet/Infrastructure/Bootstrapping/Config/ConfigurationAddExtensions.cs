@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
+using SimpleInjector.Lifestyles;
 
 namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 {
@@ -17,6 +18,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             if (env == null) throw new ArgumentNullException(nameof(env));
             if (container == null) throw new ArgumentNullException(nameof(container));
 
+            // For ASP.NET centric stuff, regester it with the framework container i.e. IServiceCollection
             services.AddHttpContextAccessor();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -26,6 +28,8 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             services.AddScoped<ICurrentUser, CurrentUserAdapter>();
             services.AddScoped<ApiExceptionFilter>();
 
+            //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
+
             services.AddSimpleInjector(container, options =>
             {
                 // AddAspNetCore() method wraps web requests in a Simple Injector scope.
@@ -33,12 +37,12 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                     // Ensure activation of a specific framework type to be created by
                     // Simple Injector instead of the built-in configuration system.
                     .AddControllerActivation();
-                
-                options.AddLogging(); // <-- This registers all logging abstractions
-                
+
+                options.AddLogging(); // <-- This registers all logging abstractions                
+
                 //.AddViewComponentActivation()
                 //.AddPageModelActivation()
-                //.AddTagHelperActivation();
+                //.AddTagHelperActivation();                
             });
         }
     }

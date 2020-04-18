@@ -18,6 +18,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc
             if (applicationServicesFullNs.Trim().Equals(string.Empty)) throw new ArgumentException(nameof(applicationServicesFullNs) + " cannot be an empty string.");
 
             const string applicationServicesInterface = nameof(IApplicationService);
+            const string applicationDataServicesInterface = nameof(IApplicationDataService);
 
             var applicationServices = assembly.GetExportedTypes()
                 .Where(t => t.Namespace != null
@@ -25,7 +26,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc
                 .Where(t => t.GetInterfaces().Any() && !t.IsInterface)
                 .Select(type => new
                 {
-                    Service = type.GetInterfaces().First(i => i.Name != applicationServicesInterface),
+                    Service = type.GetInterfaces().First(i => i.Name != applicationServicesInterface && i.Name != applicationDataServicesInterface),
                     Implementation = type
                 });
 

@@ -1,14 +1,9 @@
-﻿using System.Linq;
-using System.Security.Claims;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using KesselRun.Web.Api.Infrastructure.Diagnostic;
 using KesselRun.Web.Api.Messaging.Commands;
 using KesselRunFramework.AspNet.Response;
-using KesselRunFramework.Core.Infrastructure.Invariants;
 using KesselRunFramework.Core.Infrastructure.Messaging;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace KesselRun.Web.Api.Messaging.CommandHandlers

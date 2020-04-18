@@ -22,10 +22,10 @@ namespace KesselRun.Web.Api.Messaging.QueryHandlers
             // Here, if the Id of 10 is passed in, a User with UserName RonBurgandy will be returned.
 
             if(request.UserId.Equals(10))
-                return new UserPayloadDto
+                return await Task.FromResult(new UserPayloadDto
                 {
                     UserName = "RonBurgandy"
-                };
+                });
 
             throw new Exception("");
         }
