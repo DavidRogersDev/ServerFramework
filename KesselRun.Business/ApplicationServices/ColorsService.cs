@@ -6,7 +6,7 @@ using KesselRunFramework.Core;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Drawing;
-
+using KesselRunFramework.Core.Infrastructure.Validation;
 
 namespace KesselRun.Business.ApplicationServices
 {
@@ -20,7 +20,7 @@ namespace KesselRun.Business.ApplicationServices
             _colorValidator = colorValidator;
         }
 
-        public async Task<(ValidationResult ValidationResult, List<ColorPayloadDto> DTOs)> GetColorsAsync()
+        public async Task<Either<IEnumerable<ColorPayloadDto>, ValidationResult>> GetColorsAsync()
         {
             // This example is a bit silly.
             // Here, for the purposes of this example, the business rule is that the collection of colors that
@@ -43,7 +43,10 @@ namespace KesselRun.Business.ApplicationServices
 
             var validationResult = await _colorValidator.ValidateAsync(colorPayloadDtos);
 
-            return (validationResult, colorPayloadDtos);
+            if (validationResult.IsValid)
+                return colorPayloadDtos;
+
+            return validationResult;
         }
     }
 }

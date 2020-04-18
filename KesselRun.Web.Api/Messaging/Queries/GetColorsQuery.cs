@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace KesselRun.Web.Api.Messaging.Queries
 {
-    public class GetColorsQuery : IRequest<Either<List<ColorPayloadDto>, ValidationResult>>
+    public class GetColorsQuery : IRequest<Either<IEnumerable<ColorPayloadDto>, ValidationResult>>
     {
         // no properties necessary, as the query will return all Colors.
     }

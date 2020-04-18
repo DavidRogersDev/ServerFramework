@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KesselRun.Web.Api.Messaging.QueryHandlers
 {
-    public class GetColorsQueryHandler : IRequestHandler<GetColorsQuery, Either<List<ColorPayloadDto>, ValidationResult>>
+    public class GetColorsQueryHandler : IRequestHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidationResult>>
     {
         private readonly IColorsService _colorsService;
 
@@ -19,14 +19,9 @@ namespace KesselRun.Web.Api.Messaging.QueryHandlers
             _colorsService = colorsService;
         }
 
-        public async Task<Either<List<ColorPayloadDto>, ValidationResult>> Handle(GetColorsQuery request, CancellationToken cancellationToken)
+        public async Task<Either<IEnumerable<ColorPayloadDto>, ValidationResult>> Handle(GetColorsQuery request, CancellationToken cancellationToken)
         {
-            var result = await _colorsService.GetColorsAsync();
-
-            if (!result.ValidationResult.IsValid)
-                return result.ValidationResult;
-
-            return result.DTOs;
+            return await _colorsService.GetColorsAsync();            
         }
     }
 }
