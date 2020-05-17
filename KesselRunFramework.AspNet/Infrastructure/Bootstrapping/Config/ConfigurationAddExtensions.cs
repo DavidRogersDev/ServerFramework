@@ -15,20 +15,15 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
         public static void ConfigureAppServices(this IServiceCollection services, IWebHostEnvironment env, Container container)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
-            if (env == null) throw new ArgumentNullException(nameof(env));
-            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (env == null) throw new ArgumentNullException(nameof(env));            
 
             // For ASP.NET centric stuff, regester it with the framework container i.e. IServiceCollection
             services.AddHttpContextAccessor();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            services.AddHttpClient(); // this registers IHttpClientFactory, which we inject into some services to get HttpClients.
-
+            
             services.AddScoped<ICurrentUser, CurrentUserAdapter>();
             services.AddScoped<ApiExceptionFilter>();
-
-            //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
 
             services.AddSimpleInjector(container, options =>
             {
@@ -38,12 +33,15 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                     // Simple Injector instead of the built-in configuration system.
                     .AddControllerActivation();
 
-                options.AddLogging(); // <-- This registers all logging abstractions                
+                options.AddLogging(); // <-- This registers all logging abstractions         
+
+                options.AutoCrossWireFrameworkComponents = true;
 
                 //.AddViewComponentActivation()
                 //.AddPageModelActivation()
                 //.AddTagHelperActivation();                
             });
+
         }
     }
 }

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using System.Reflection;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using KesselRun.Business.DataTransferObjects;
+using KesselRun.Web.Api.HttpClients;
 using KesselRun.Web.Api.Infrastructure.Ioc;
 using KesselRun.Web.Api.Infrastructure.Mapping;
 using KesselRunFramework.AspNet.Infrastructure.ActionFilters;
@@ -15,6 +17,7 @@ using KesselRunFramework.AspNet.Messaging.Pipelines;
 using KesselRunFramework.AspNet.Middleware;
 using KesselRunFramework.AspNet.Validation;
 using KesselRunFramework.Core.Infrastructure.Extensions;
+using KesselRunFramework.Core.Infrastructure.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -51,6 +54,21 @@ namespace KesselRun.Web.Api
 
             services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration);
             services.ConfigureAppServices(WebHostEnvironment, Container);
+
+            //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
+
+            services.RegisterAllClients(new []{ typeof(OpenMovieDbClient),typeof(WeatherClient) });
+            //services.AddHttpClient<OpenMovieDbClient>()
+            //    .ConfigurePrimaryHttpMessageHandler(handler => new HttpClientHandler
+            //{
+            //    AutomaticDecompression = System.Net.DecompressionMethods.GZip
+            //}); // this registers IHttpClientFactory. Transient scope
+            services.AddHttpClient<WeatherClient>()
+                .ConfigurePrimaryHttpMessageHandler(handler => new HttpClientHandler
+                {
+                    AutomaticDecompression = System.Net.DecompressionMethods.GZip
+                }); // this registers IHttpClientFactory. Transient scope
+
         }
 
 
@@ -88,9 +106,11 @@ namespace KesselRun.Web.Api
         {
             var assemblies = GetAssemblies();
 
+            Container.RegisterSingleton<ITypedClientResolver, TypedClientResolver>();
+
             Container.RegisterValidationAbstractions(new[] { assemblies[StartUp.Executing], assemblies[StartUp.Domain] });
             Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(assemblies));
-            Container.RegisterMediatRAbstractions(new []{ assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
+            Container.RegisterMediatRAbstractions(new[] { assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
             Container.RegisterApplicationServices(assemblies[StartUp.Domain], Configuration, "KesselRun.Business.ApplicationServices");
         }
 
@@ -119,7 +139,7 @@ namespace KesselRun.Web.Api
             };
 
             // include any custom (domain) assemblies which will require scanning as part of the startup process.
-            
+
             return assemblies;
         }
 
