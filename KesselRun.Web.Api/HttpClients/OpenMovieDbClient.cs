@@ -4,15 +4,16 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using KesselRunFramework.AspNet.Infrastructure.HttpClient;
 
 namespace KesselRun.Web.Api.HttpClients
 {
-    public class OpenMovieDbClient : TypedClientBase
+    public class OpenMovieDbClient : TypedClientBase, ITypedHttpClient
     {
         public OpenMovieDbClient(HttpClient httpClient)
             : base(httpClient)
         {
-            httpClient.BaseAddress = new Uri("https://www.omdbapi.com");
+            HttpClient.BaseAddress = new Uri("https://www.omdbapi.com");
             UriBuilder = new UriBuilder(HttpClient.BaseAddress);
             QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
             QueryStringParams["apikey"] = "";

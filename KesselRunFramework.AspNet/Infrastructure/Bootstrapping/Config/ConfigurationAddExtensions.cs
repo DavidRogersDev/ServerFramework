@@ -35,7 +35,9 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 
                 options.AddLogging(); // <-- This registers all logging abstractions         
 
-                options.AutoCrossWireFrameworkComponents = true;
+                // Important for things like Http clients which are owned by the ServicesCollection but get
+                // injected into things like MediatR request handlers, which use SimpleInjector for its IOC needs. 
+                options.AutoCrossWireFrameworkComponents = true; 
 
                 //.AddViewComponentActivation()
                 //.AddPageModelActivation()

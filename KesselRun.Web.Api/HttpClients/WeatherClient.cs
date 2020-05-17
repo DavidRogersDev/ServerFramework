@@ -4,10 +4,11 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using KesselRunFramework.AspNet.Infrastructure.HttpClient;
 
 namespace KesselRun.Web.Api.HttpClients
 {
-    public class WeatherClient : TypedClientBase
+    public class WeatherClient : TypedClientBase, ITypedHttpClient
     {
         public string City { get; set; }
         public string Units { get; set; }
@@ -15,7 +16,7 @@ namespace KesselRun.Web.Api.HttpClients
         public WeatherClient(HttpClient httpClient)
             : base(httpClient)
         {
-            httpClient.BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/weather");
+            HttpClient.BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/weather");
             UriBuilder = new UriBuilder(HttpClient.BaseAddress);
             QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
             QueryStringParams["appid"] = "";

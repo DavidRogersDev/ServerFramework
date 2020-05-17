@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using AutoMapper;
@@ -12,6 +13,7 @@ using KesselRun.Web.Api.Infrastructure.Mapping;
 using KesselRunFramework.AspNet.Infrastructure.ActionFilters;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc;
+using KesselRunFramework.AspNet.Infrastructure.HttpClient;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
 using KesselRunFramework.AspNet.Messaging.Pipelines;
 using KesselRunFramework.AspNet.Middleware;
@@ -57,18 +59,11 @@ namespace KesselRun.Web.Api
 
             //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
 
-            services.RegisterAllClients(new []{ typeof(OpenMovieDbClient),typeof(WeatherClient) });
-            //services.AddHttpClient<OpenMovieDbClient>()
-            //    .ConfigurePrimaryHttpMessageHandler(handler => new HttpClientHandler
-            //{
-            //    AutomaticDecompression = System.Net.DecompressionMethods.GZip
-            //}); // this registers IHttpClientFactory. Transient scope
-            services.AddHttpClient<WeatherClient>()
-                .ConfigurePrimaryHttpMessageHandler(handler => new HttpClientHandler
-                {
-                    AutomaticDecompression = System.Net.DecompressionMethods.GZip
-                }); // this registers IHttpClientFactory. Transient scope
+            var httpClientTypes = typeof(Startup).GetTypeInfo().Assembly.GetExportedTypes()
+                    .Where(t => t.IsClass && typeof(ITypedHttpClient).IsAssignableFrom(t))
+                ;
 
+            services.RegisterTypedHttpClients(httpClientTypes);
         }
 
 
