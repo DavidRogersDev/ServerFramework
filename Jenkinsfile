@@ -1,8 +1,11 @@
 pipeline {
     agent any
+
     stages {
         stage("Verfiy branch") {
-            echo $GIT_BRANCH
+            steps {
+                echo "$GIT_BRANCH"
+            }            
         }
     }
 }
