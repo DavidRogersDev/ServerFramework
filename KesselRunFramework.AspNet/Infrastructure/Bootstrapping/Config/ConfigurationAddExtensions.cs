@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
 
@@ -33,7 +34,10 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                     // Simple Injector instead of the built-in configuration system.
                     .AddControllerActivation();
 
-                options.AddLogging(); // <-- This registers all logging abstractions         
+                services.AddScoped<ILogger>(c => container.GetInstance<ILogger>());
+
+                options.AddLogging(); // <-- This registers all logging abstractions      
+                
 
                 // Important for things like Http clients which are owned by the ServicesCollection but get
                 // injected into things like MediatR request handlers, which use SimpleInjector for its IOC needs. 

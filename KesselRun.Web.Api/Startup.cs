@@ -60,8 +60,7 @@ namespace KesselRun.Web.Api
             //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
 
             var httpClientTypes = typeof(Startup).GetTypeInfo().Assembly.GetExportedTypes()
-                    .Where(t => t.IsClass && typeof(ITypedHttpClient).IsAssignableFrom(t))
-                ;
+                    .Where(t => t.IsClass && typeof(ITypedHttpClient).IsAssignableFrom(t));
 
             services.RegisterTypedHttpClients(httpClientTypes);
         }

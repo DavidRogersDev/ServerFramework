@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using KesselRun.Business.DataTransferObjects.Weather;
 using MediatR;
 
 namespace KesselRun.Web.Api.Messaging.Queries
 {
-    public class GetWeatherQuery : IRequest<string>
+    public class GetWeatherQuery : IRequest<WeatherDto>
     {
-
+        public string City { get; set; }
+        public string Units { get; set; }
     }
 }
