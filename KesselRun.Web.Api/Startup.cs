@@ -37,10 +37,13 @@ namespace KesselRun.Web.Api
         {
             Configuration = configuration;
             WebHostEnvironment = webHostEnvironment;
+            Assemblies = GetAssemblies();
         }
 
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment WebHostEnvironment { get; }
+        public IEnumerable<Type> ExportedTypesWebAssembly { get; set; }
+        IDictionary<string, Assembly> Assemblies { get; set; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -59,7 +62,9 @@ namespace KesselRun.Web.Api
 
             //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
 
-            var httpClientTypes = typeof(Startup).GetTypeInfo().Assembly.GetExportedTypes()
+            ExportedTypesWebAssembly = Assemblies[StartUp.Executing].GetExportedTypes();
+
+            var httpClientTypes = ExportedTypesWebAssembly
                     .Where(t => t.IsClass && typeof(ITypedHttpClient).IsAssignableFrom(t));
 
             services.RegisterTypedHttpClients(httpClientTypes);
@@ -98,14 +103,12 @@ namespace KesselRun.Web.Api
 
         private void RegisterApplicationServices()
         {
-            var assemblies = GetAssemblies();
-
             Container.RegisterSingleton<ITypedClientResolver, TypedClientResolver>();
 
-            Container.RegisterValidationAbstractions(new[] { assemblies[StartUp.Executing], assemblies[StartUp.Domain] });
-            Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(assemblies));
-            Container.RegisterMediatRAbstractions(new[] { assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
-            Container.RegisterApplicationServices(assemblies[StartUp.Domain], Configuration, "KesselRun.Business.ApplicationServices");
+            Container.RegisterValidationAbstractions(new[] { Assemblies[StartUp.Executing], Assemblies[StartUp.Domain] });
+            Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(Assemblies));
+            Container.RegisterMediatRAbstractions(new[] { Assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
+            Container.RegisterApplicationServices(Assemblies[StartUp.Domain], Configuration, "KesselRun.Business.ApplicationServices");
         }
 
         private static Type[] GetTypesForPipeline(IWebHostEnvironment webHostEnvironment)

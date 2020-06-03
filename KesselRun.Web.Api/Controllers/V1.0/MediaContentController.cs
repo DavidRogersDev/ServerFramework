@@ -31,9 +31,13 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetTvShow([FromQuery]TvShowPayloadDto tvShowPayload)
         {
-            var result = await _mediator.Send(new GetTvShowQuery { Season = tvShowPayload.Season, Title = tvShowPayload.Title });
+            var tvShow = await _mediator.Send(new GetTvShowQuery { Season = tvShowPayload.Season, Title = tvShowPayload.Title });
 
-            return Ok(result);
+            return tvShow.Match(
+                t => OkResponse(tvShow.LeftOrDefault()),
+                p => InternalServerErrorResponse(tvShow.RightOrDefault(), OperationOutcome.UnSuccessfulOutcome)
+            );
+
         }
     }
 }

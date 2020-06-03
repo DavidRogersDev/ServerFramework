@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using FluentValidation;
 using KesselRunFramework.AspNet.Validation;
@@ -13,7 +14,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc
 
         }
 
-        public static void RegisterValidationAbstractions(this Container container, Assembly[] validationAssemblies)
+        public static void RegisterValidationAbstractions(this Container container, IEnumerable<Assembly> validationAssemblies)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (validationAssemblies == null) throw new ArgumentNullException(nameof(validationAssemblies));
