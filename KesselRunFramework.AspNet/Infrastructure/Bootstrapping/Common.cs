@@ -29,19 +29,12 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping
                 {
                     Errors = errors
                 },
-                Outcome = new OperationOutcome
-                {
-                    ErrorId = string.Empty,
-                    Errors = errors.SelectMany(
-                        keyValuePair => keyValuePair.Value
-                            .Select(
-                                str => string.Concat(keyValuePair.Key, GeneralPurpose.UniqueDelimiter, str)
-                                )
-                        ),
-                    IsValidationFail = true,
-                    IsError = false,
-                    OpResult = OpResult.Fail
-                }
+                Outcome = OperationOutcome.ValidationFailOutcome(errors.SelectMany(
+                    keyValuePair => keyValuePair.Value
+                        .Select(
+                            str => string.Concat(keyValuePair.Key, GeneralPurpose.UniqueDelimiter, str)
+                        )
+                ))
             };
 
             return payload;
