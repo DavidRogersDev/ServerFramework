@@ -1,22 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
-using KesselRun.Business.DataTransferObjects.Weather;
 using KesselRunFramework.AspNet.Infrastructure.HttpClient;
 using KesselRunFramework.Core.Infrastructure.Errors;
-using KesselRunFramework.Core.Infrastructure.Extensions;
 using KesselRunFramework.Core.Infrastructure.Logging;
 using KesselRunFramework.Core.Infrastructure.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace KesselRun.Web.Api.HttpClients
 {

@@ -68,8 +68,8 @@ namespace KesselRun.Web.Api.HttpClients
                     problemDetails.Status = (int) HttpStatusCode.Unauthorized;
 
                     return problemDetails;
-
                 }
+
                 throw;
             }
         }

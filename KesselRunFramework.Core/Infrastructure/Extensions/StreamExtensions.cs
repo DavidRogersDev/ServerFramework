@@ -12,7 +12,7 @@ namespace KesselRunFramework.Core.Infrastructure.Extensions
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             if (!stream.CanRead)
-                throw new NotSupportedException("It is not possible to read from this stream");
+                throw new NotSupportedException("It is not possible to read from this stream.");
 
             using (var streamReader = new StreamReader(stream))
             using (var jsonTextReader = new JsonTextReader(streamReader))
