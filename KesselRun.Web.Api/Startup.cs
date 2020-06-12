@@ -57,7 +57,7 @@ namespace KesselRun.Web.Api
                 .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions)
                 .AddFluentValidation(fv => fv.ValidatorFactory = new SiteFluentValidatorFactory(Container));
 
-            services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration);
+            services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, new []{ Swagger.DocVersions.v1_0, Swagger.DocVersions.v1_1});
             services.ConfigureAppServices(WebHostEnvironment, Container);
 
             //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
@@ -89,7 +89,7 @@ namespace KesselRun.Web.Api
 
             app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = RequestLoggingConfigurer.EnrichFromRequest);
 
-            app.UseSwaggerInDevAndStaging(WebHostEnvironment);
+            app.UseSwaggerInDevAndStaging(WebHostEnvironment, new []{ Swagger.DocVersions.v1_0, Swagger.DocVersions.v1_1});
 
             app.UseRouting();
 

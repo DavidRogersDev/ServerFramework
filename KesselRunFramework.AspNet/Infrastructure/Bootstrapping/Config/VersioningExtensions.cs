@@ -4,10 +4,11 @@ using System.Linq;
 using System.Reflection;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config.SwaggerFilters;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
-using KesselRunFramework.AspNet.Infrastructure.SwaggerFilters;
+using KesselRunFramework.Core.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -17,33 +18,39 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 {
     public static class VersioningExtensions
     {
-        public static IServiceCollection AddAppApiVersioning(this IServiceCollection services)
+        public static IServiceCollection AddAppApiVersioning(this IServiceCollection services, Action<ApiVersioningOptions> apiVersioningOptionsAction = null)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            services.AddApiVersioning(o =>
+            services.AddApiVersioning(apiVersioningOptionsAction ?? (o =>
             {
                 o.DefaultApiVersion = new ApiVersion(StartUp.MajorVersion1, StartUp.MinorVersion0); // specify the default api version
                 o.AssumeDefaultVersionWhenUnspecified = true; // assume that the caller wants the default version if they don't specify
                 o.ReportApiVersions = true; // add headers in responses which show supported/deprecated versions
-            });
+            }));
 
             return services;
         }
 
-        public static IServiceCollection AddSwagger(this IServiceCollection services, IWebHostEnvironment hostingEnvironment, IConfiguration configuration)
+        public static IServiceCollection AddSwagger(this IServiceCollection services, 
+            IWebHostEnvironment hostingEnvironment, 
+            IConfiguration configuration,
+            string[] versions)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            if (versions == null) throw new ArgumentNullException(nameof(versions));
 
             if (hostingEnvironment.IsDevelopmentOrIsStaging())
             {
                 services.AddSwaggerGen(c =>
                 {
-                    c.SwaggerDoc(Swagger.DocVersions.v1_0, CreateInfoForApiVersion(configuration, Swagger.DocVersions.v1_0));
-                    /******************* Add versions as below *******************/
-                    //c.SwaggerDoc(Swagger.DocVersions.v1_1, CreateInfoForApiVersion(configuration, Swagger.DocVersions.v1_1));
+                    /******************* Add versions *******************/
+                    for (int i = 0; i < versions.Length; i++)
+                    {
+                        c.SwaggerDoc(versions[i], CreateInfoForApiVersion(configuration, versions[i]));
+                    }
 
                     c.OperationFilter<RemoveVersionFromParameterFilter>();
                     c.DocumentFilter<ReplaceVersionWithExactValueInPath>();
@@ -68,24 +75,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                         return versions.Any(v => $"v{v.ToString()}" == docName) 
                                && (maps.Length == 0 || maps.Any(v => $"v{v.ToString()}" == docName));
                     });
-
-                    #region Add Verions here
-
-                    //c.SwaggerDoc("v1.1", new OpenApiInfo
-                    //{
-                    //    Version = "v1.1",
-                    //    Title = "Abatements API",
-                    //    Description = "A API to serve the Abatements application",
-                    //    //TermsOfService = new Uri("https://example.com/terms"),
-                    //    Contact = new OpenApiContact
-                    //    {
-                    //        Name = "David Rogers",
-                    //        Email = "David.Rogers@incontrol.com"
-                    //    }
-                    //});
-
-                    #endregion
-
+                    
                     c.AddSecurityDefinition(Invariants.Identity.Bearer, new OpenApiSecurityScheme
                     {
                         Description = Swagger.SecurityDefinition.Description,
@@ -123,7 +113,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             return services;
         }
 
-        public static void UseSwaggerInDevAndStaging(this IApplicationBuilder app, IWebHostEnvironment hostingEnvironment)
+        public static void UseSwaggerInDevAndStaging(this IApplicationBuilder app, IWebHostEnvironment hostingEnvironment, string[] versions)
         {
             if (hostingEnvironment.IsDevelopmentOrIsStaging())
             {
@@ -131,12 +121,13 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 
                 app.UseSwaggerUI(c =>
                     {
-                        c.SwaggerEndpoint(
-                            $"/swagger/{Swagger.DocVersions.v1_0}/swagger.json", 
-                            $"Abatements API {Swagger.DocVersions.v1_0}"
+                        for (int i = 0; i < versions.Length; i++)
+                        {
+                            c.SwaggerEndpoint(
+                                Swagger.EndPoint.Url.FormatAs(versions[i]),
+                                Swagger.EndPoint.Name.FormatAs(versions[i])
                             );
-                        /******************* Add versions as below *******************/
-                        //c.SwaggerEndpoint($"/swagger/{Swagger.DocVersions.v1_1}/swagger.json", $"Abatements API {Swagger.Versions.v1_1}");
+                        }
                     });
             }
         }
