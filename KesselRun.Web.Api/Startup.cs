@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using SimpleInjector;
 
@@ -49,12 +51,10 @@ namespace KesselRun.Web.Api
                 .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions)
                 .AddFluentValidation(fv => fv.ValidatorFactory = new SiteFluentValidatorFactory(Container));
 
-            var swaggerConfiguration = new ConfigurationBuilder()
-                .SetBasePath(Program.BasePath)
-                .AddJsonFile("swaggerconfig.json")
-                .Build();
 
-            services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration);
+            var openApiInfos = GetOpenApiInfo("swaggerconfig.json");
+
+            services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, openApiInfos);
             services.ConfigureAppServices(WebHostEnvironment, Container);
         }
 
@@ -137,5 +137,20 @@ namespace KesselRun.Web.Api
             return abatementsApiProfile.InArray();
         }
 
+        private static List<OpenApiInfo> GetOpenApiInfo(string swaggerSettingsFile)
+        {
+            var swaggerConfiguration = new ConfigurationBuilder()
+                .SetBasePath(Program.BasePath)
+                .AddJsonFile(swaggerSettingsFile)
+                .Build();
+
+            var services = new ServiceCollection();
+            services.AddSingleton<List<OpenApiInfo>>(p => p.GetRequiredService<IOptions<List<OpenApiInfo>>>().Value);
+            services.Configure<List<OpenApiInfo>>(options => swaggerConfiguration.GetSection("OpenApiInfo").Bind(options));
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            return serviceProvider.GetService<List<OpenApiInfo>>();
+        }
     }
 }

@@ -31,7 +31,10 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             return services;
         }
 
-        public static IServiceCollection AddSwagger(this IServiceCollection services, IWebHostEnvironment hostingEnvironment, IConfiguration configuration)
+        public static IServiceCollection AddSwagger(this IServiceCollection services,
+            IWebHostEnvironment hostingEnvironment, 
+            IConfiguration configuration, 
+            List<OpenApiInfo> openApiInfos)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
@@ -41,9 +44,15 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             {
                 services.AddSwaggerGen(c =>
                 {
-                    c.SwaggerDoc(Swagger.DocVersions.v1_0, CreateInfoForApiVersion(configuration, Swagger.DocVersions.v1_0));
-                    /******************* Add versions as below *******************/
-                    //c.SwaggerDoc(Swagger.DocVersions.v1_1, CreateInfoForApiVersion(configuration, Swagger.DocVersions.v1_1));
+                    //for (int i = 0; i < openApiInfos.Count; i++)
+                    //{
+                    //    var name = "v" + openApiInfos[i].Version;
+                    //    c.SwaggerDoc(name, openApiInfos[i]);
+                    //}
+
+                    c.SwaggerDoc(Swagger.DocVersions.v1_0, CreateInfoForApiVersion(Swagger.DocVersions.v1_0));
+                    c.SwaggerDoc(Swagger.DocVersions.v1_1, CreateInfoForApiVersion(Swagger.DocVersions.v1_1));
+
 
                     c.OperationFilter<RemoveVersionFromParameterFilter>();
                     c.DocumentFilter<ReplaceVersionWithExactValueInPath>();
@@ -131,18 +140,16 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 
                 app.UseSwaggerUI(c =>
                     {
-                        c.SwaggerEndpoint(
-                            $"/swagger/{Swagger.DocVersions.v1_0}/swagger.json", 
-                            $"Abatements API {Swagger.DocVersions.v1_0}"
-                            );
+                        c.SwaggerEndpoint($"/swagger/{Swagger.DocVersions.v1_0}/swagger.json", $"Abatements API {Swagger.Versions.v1_0}");
+
                         /******************* Add versions as below *******************/
-                        //c.SwaggerEndpoint($"/swagger/{Swagger.DocVersions.v1_1}/swagger.json", $"Abatements API {Swagger.Versions.v1_1}");
+                        c.SwaggerEndpoint($"/swagger/{Swagger.DocVersions.v1_1}/swagger.json", $"Abatements API {Swagger.Versions.v1_1}");
                     });
             }
         }
 
 
-        private static OpenApiInfo CreateInfoForApiVersion(IConfiguration configuration, string version)
+        private static OpenApiInfo CreateInfoForApiVersion(string version)
         {
             var info = new OpenApiInfo
             {
