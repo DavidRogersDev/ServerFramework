@@ -5,6 +5,7 @@
         AppThrown = 1,
         UncaughtInAction = 2,
         UncaughtGlobal = 3,
-        PipelineThrown = 4
+        PipelineThrown = 4,
+        HttpClient = 5
     }
 }

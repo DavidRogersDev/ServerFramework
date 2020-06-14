@@ -1,6 +1,6 @@
 ﻿namespace KesselRunFramework.DataAccess
 {
-    public interface IDbFoundary
+    public interface IDbResolver
     {
         /// <summary>
         /// This method resolves the context (application-specific) and returns it.

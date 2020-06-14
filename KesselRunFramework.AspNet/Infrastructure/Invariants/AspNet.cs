@@ -9,7 +9,7 @@
             public const string Controller = "controller";
             public const string ControllerTemplate = "[controller]";
             public const string DefaultControllerTemplate = "v{version:apiVersion}/" + ControllerTemplate;
-            public const string GroupIdAction = ActionTemplate + "/{groupId:int}";
+            public const string TvShowAction = ActionTemplate + "/{title:string}";
             public const string CategoryIdAction = ActionTemplate + "/{categoryId:int}";
             public const string PriorityAction = ActionTemplate + "/{categoryId}/{groupId}";
             public const string JobsForDateAction = ActionTemplate + "/{date}";
