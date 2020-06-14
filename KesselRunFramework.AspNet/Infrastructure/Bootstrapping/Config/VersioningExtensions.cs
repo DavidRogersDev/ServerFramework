@@ -50,8 +50,8 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                     //    c.SwaggerDoc(name, openApiInfos[i]);
                     //}
 
-                    c.SwaggerDoc(Swagger.DocVersions.v1_0, CreateInfoForApiVersion(Swagger.DocVersions.v1_0));
-                    c.SwaggerDoc(Swagger.DocVersions.v1_1, CreateInfoForApiVersion(Swagger.DocVersions.v1_1));
+                    c.SwaggerDoc("v1.0", CreateInfoForApiVersion("v1.0"));
+                    c.SwaggerDoc("v1.2", CreateInfoForApiVersion("v1.2"));
 
 
                     c.OperationFilter<RemoveVersionFromParameterFilter>();
@@ -140,10 +140,10 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 
                 app.UseSwaggerUI(c =>
                     {
-                        c.SwaggerEndpoint($"/swagger/{Swagger.DocVersions.v1_0}/swagger.json", $"Abatements API {Swagger.Versions.v1_0}");
+                        c.SwaggerEndpoint($"/swagger/v1.0/swagger.json", $"Abatements API {Swagger.DocVersions.v1_0}");
 
                         /******************* Add versions as below *******************/
-                        c.SwaggerEndpoint($"/swagger/{Swagger.DocVersions.v1_1}/swagger.json", $"Abatements API {Swagger.Versions.v1_1}");
+                        c.SwaggerEndpoint($"/swagger/v1.2/swagger.json", $"Abatements API {Swagger.DocVersions.v1_1}");
                     });
             }
         }

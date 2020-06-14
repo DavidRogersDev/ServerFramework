@@ -17,7 +17,7 @@
       },
       "Description": "An API to serve the Abatements application.",
       "TermsOfService": "https://smh.com.au",
-      "Title": "Abatements V2 API",
+      "Title": "Abatements API",
       "Version": "1.1"
     }
   ]
