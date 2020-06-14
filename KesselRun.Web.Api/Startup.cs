@@ -49,6 +49,11 @@ namespace KesselRun.Web.Api
                 .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions)
                 .AddFluentValidation(fv => fv.ValidatorFactory = new SiteFluentValidatorFactory(Container));
 
+            var swaggerConfiguration = new ConfigurationBuilder()
+                .SetBasePath(Program.BasePath)
+                .AddJsonFile("swaggerconfig.json")
+                .Build();
+
             services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration);
             services.ConfigureAppServices(WebHostEnvironment, Container);
         }
@@ -90,7 +95,7 @@ namespace KesselRun.Web.Api
 
             Container.RegisterValidationAbstractions(new[] { assemblies[StartUp.Executing], assemblies[StartUp.Domain] });
             Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(assemblies));
-            Container.RegisterMediatRAbstractions(new []{ assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
+            Container.RegisterMediatRAbstractions(new[] { assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
             Container.RegisterApplicationServices(assemblies[StartUp.Domain], Configuration, "KesselRun.Business.ApplicationServices");
         }
 
@@ -119,7 +124,7 @@ namespace KesselRun.Web.Api
             };
 
             // include any custom (domain) assemblies which will require scanning as part of the startup process.
-            
+
             return assemblies;
         }
 
