@@ -77,7 +77,7 @@ namespace KesselRun.Web.Api
 
             app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = RequestLoggingConfigurer.EnrichFromRequest);
 
-            app.UseSwaggerInDevAndStaging(WebHostEnvironment);
+            app.UseSwaggerInDevAndStaging(WebHostEnvironment, new [] { Swagger.DocVersions.v1_0, Swagger.DocVersions.v1_1 });
 
             app.UseRouting();
 

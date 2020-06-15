@@ -29,6 +29,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
 
         }
 
+        [HttpGet]
         [Route(AspNet.Mvc.ActionTemplate)]
         [MapToApiVersion(Swagger.Versions.v1_0)]
         [ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_0)]

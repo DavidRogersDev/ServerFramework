@@ -28,6 +28,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Invariants
         {
             public const string v1_0 = "1.0";
             public const string v1_1 = "1.1";
+            public const string VersionPrefix = "v";
         }
 
         public sealed class DocVersions
