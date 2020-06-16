@@ -81,7 +81,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.ActionFilters
                             operationOutcome.Message,
                             operationOutcome.ErrorId
                             );
-                        
+
                         context.Exception = null;
                     }
                 }
@@ -101,32 +101,24 @@ namespace KesselRunFramework.AspNet.Infrastructure.ActionFilters
 
         private OperationOutcome GetClientErrorPayload(Origin origin, Exception exception)
         {
-            var operationOutcome = new OperationOutcome
-            {
-                OpResult = OpResult.Fail
-            };
+            var operationOutcome = default(OperationOutcome);
 
             switch (origin)
             {
                 case Origin.ValidationError:
-
-                    var errors = ((ApiValidationException) exception).Errors;
-
-                    operationOutcome.Errors = errors;
-                    operationOutcome.IsValidationFail = true;
-                    operationOutcome.IsError = true;
-                    operationOutcome.Message = Errors.ValidationFailure;
-
+                    operationOutcome = OperationOutcome.ValidationFailOutcome(
+                        ((ApiValidationException)exception).Errors,
+                        Errors.ValidationFailure
+                        );
                     break;
 
                 case Origin.Action:
                 case Origin.Unhandled:
-                
-                    operationOutcome.IsValidationFail = false;
-                    operationOutcome.IsError = true;
+
+                    operationOutcome = OperationOutcome.UnSuccessfulOutcome;
                     operationOutcome.ErrorId = Guid.NewGuid().ToString();
 
-#if !DEBUG
+#if DEBUG
                     operationOutcome.Message = string.Format(Errors.UnhandledErrorDebug, exception.GetBaseException().Message);
                     operationOutcome.Errors = exception.StackTrace.Split(
                         Environment.NewLine, StringSplitOptions.RemoveEmptyEntries
@@ -136,7 +128,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.ActionFilters
 #endif
 
                     break;
-                
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
             }

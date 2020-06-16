@@ -46,14 +46,9 @@ namespace KesselRunFramework.AspNet.Middleware
             var errorId = Guid.NewGuid().ToString();
 
             // This is what we tell the client.
-            var outcome = new OperationOutcome
-            {
-                ErrorId = errorId,
-                Errors = Enumerable.Empty<string>(),
-                IsError = true,
-                Message = string.Format(Errors.UnhandledError, errorId),
-                OpResult = OpResult.Fail
-            };
+            var outcome = OperationOutcome.UnSuccessfulOutcome;
+            outcome.ErrorId = errorId;
+            outcome.Message = string.Format(Errors.UnhandledError, errorId);
 
             apiExceptionOptions.AddResponseDetails?.Invoke(context, exception, outcome);
 

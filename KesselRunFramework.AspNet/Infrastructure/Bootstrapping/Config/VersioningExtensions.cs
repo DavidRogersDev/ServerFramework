@@ -35,7 +35,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
         public static IServiceCollection AddSwagger(this IServiceCollection services,
             IWebHostEnvironment hostingEnvironment, 
             IConfiguration configuration, 
-            List<OpenApiInfo> openApiInfos)
+            IList<OpenApiInfo> openApiInfos)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
@@ -123,8 +123,8 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                         for (int i = 0; i < versions.Length; i++)
                         {
                             c.SwaggerEndpoint(
-                                Swagger.EndPoint.Url.FormatAs(versions[i]),
-                                Swagger.EndPoint.Name.FormatAs(versions[i])
+                                Swagger.EndPoint.Url.FormatAs(string.Concat(Swagger.Versions.VersionPrefix, versions[i])),
+                                Swagger.EndPoint.Name.FormatAs(string.Concat(Swagger.Versions.VersionPrefix, versions[i]))
                             );
                         }
                     });

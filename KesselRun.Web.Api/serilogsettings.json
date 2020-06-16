@@ -1,17 +1,32 @@
 {
   "Serilog": {
     "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
-    "MinimumLevel": "Debug",
+    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
+    "MinimumLevel": {
+      "Default": "Verbose"
+    },
     "WriteTo": [
-      { "Name": "Console" },
+      {
+        "Name": "Console",
+        "Args": {
+          "restrictedToMinimumLevel": "Information"
+        } 
+      },
       {
         "Name": "File",
-        "Args": { "path": "Logs/apilog.log" }
+        "Args": {
+          "path": "Logs/apilog.log",
+          "fileSizeLimitBytes": 1073741824,
+          "formatter": "Serilog.Formatting.Json.JsonFormatter",
+          "retainedFileCountLimit": 30,
+          "rollingInterval": "Day",
+          "rollOnFileSizeLimit": true,
+          "restrictedToMinimumLevel": "Debug"
+        }
       }
     ],
-    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
     "Properties": {
-      "Application": "Sample"
+      "Application": "KesselRun Reference Application"
     }
   }
 }
