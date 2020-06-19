@@ -12,10 +12,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using KesselRun.Business.DataTransferObjects;
 
-namespace KesselRun.Web.Api.Controllers.V1._0
+namespace KesselRun.Web.Api.Controllers.V1._1
 {
-    [ApiVersion(Swagger.Versions.v1_0)]
+    [ApiVersion(Swagger.Versions.v1_1)]
     [Route(AspNet.Mvc.DefaultControllerTemplate)]
     [Produces(MediaTypeNames.Application.Json)]
     public class ColorsController : KesselRunApiController
@@ -31,8 +32,8 @@ namespace KesselRun.Web.Api.Controllers.V1._0
 
         [HttpGet]
         [Route(AspNet.Mvc.ActionTemplate)]
-        [MapToApiVersion(Swagger.Versions.v1_0)]
-        //[ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_0)]
+        [MapToApiVersion(Swagger.Versions.v1_1)]
+        //[ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_1)]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetColors()
@@ -40,7 +41,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
             var colors = await _mediator.Send(new GetColorsQuery());
 
             return colors.Match(
-                result => OkResponse(colors.LeftOrDefault()), 
+                result => OkResponse(colors.LeftOrDefault().Concat(new []{ new ColorPayloadDto { Color = "Yay for 1.1"}})), 
                 error => BadRequestResponse(string.Empty, OperationOutcome.ValidationFailOutcome(colors.RightOrDefault().Errors.Select(e => e.ErrorMessage)))                
                 );
         }
