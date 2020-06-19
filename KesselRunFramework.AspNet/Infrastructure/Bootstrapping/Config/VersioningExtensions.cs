@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config.SwaggerFilters;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
-using KesselRunFramework.AspNet.Infrastructure.SwaggerFilters;
 using KesselRunFramework.Core.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,7 +40,6 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-            if (versions == null) throw new ArgumentNullException(nameof(versions));
 
             if (hostingEnvironment.IsDevelopmentOrIsStaging())
             {

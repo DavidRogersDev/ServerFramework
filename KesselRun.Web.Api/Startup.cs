@@ -110,10 +110,10 @@ namespace KesselRun.Web.Api
         {
             Container.RegisterSingleton<ITypedClientResolver, TypedClientResolver>();
 
-            Container.RegisterValidationAbstractions(new[] { assemblies[StartUp.Executing], assemblies[StartUp.Domain] });
-            Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(assemblies));
-            Container.RegisterMediatRAbstractions(new[] { assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
-            Container.RegisterApplicationServices(assemblies[StartUp.Domain], Configuration, "KesselRun.Business.ApplicationServices");
+            Container.RegisterValidationAbstractions(new[] { Assemblies[StartUp.Executing], Assemblies[StartUp.Domain] });
+            Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(Assemblies));
+            Container.RegisterMediatRAbstractions(new[] { Assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
+            Container.RegisterApplicationServices(Assemblies[StartUp.Domain], Configuration, "KesselRun.Business.ApplicationServices");
         }
 
         private static Type[] GetTypesForPipeline(IWebHostEnvironment webHostEnvironment)
