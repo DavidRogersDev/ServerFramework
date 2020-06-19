@@ -9,6 +9,7 @@ using KesselRunFramework.Core.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -18,16 +19,16 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 {
     public static class VersioningExtensions
     {
-        public static IServiceCollection AddAppApiVersioning(this IServiceCollection services)
+        public static IServiceCollection AddAppApiVersioning(this IServiceCollection services, Action<ApiVersioningOptions> options = null)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            services.AddApiVersioning(o =>
+            services.AddApiVersioning(options ?? (o =>
             {
                 o.DefaultApiVersion = new ApiVersion(StartUp.MajorVersion1, StartUp.MinorVersion0); // specify the default api version
                 o.AssumeDefaultVersionWhenUnspecified = true; // assume that the caller wants the default version if they don't specify
                 o.ReportApiVersions = true; // add headers in responses which show supported/deprecated versions
-            });
+            }));
 
             return services;
         }

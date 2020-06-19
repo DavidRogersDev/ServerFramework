@@ -17,7 +17,6 @@ namespace KesselRun.Web.Api
         
         public static void Main(string[] args)
         {
-
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(BasePath)
                 .AddJsonFile("serilogsettings.json")

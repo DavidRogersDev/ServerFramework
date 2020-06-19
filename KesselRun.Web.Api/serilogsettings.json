@@ -1,7 +1,7 @@
 {
   "Serilog": {
-    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
-    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
+    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File", "KesselRunFramework.AspNet" ],
+    "Enrich": [ "FromLogContext", "WithEventType" ],
     "MinimumLevel": {
       "Default": "Verbose"
     },
@@ -21,7 +21,7 @@
           "retainedFileCountLimit": 30,
           "rollingInterval": "Day",
           "rollOnFileSizeLimit": true,
-          "restrictedToMinimumLevel": "Debug"
+          "restrictedToMinimumLevel": "Information"
         }
       }
     ],

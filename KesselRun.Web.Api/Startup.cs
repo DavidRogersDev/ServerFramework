@@ -53,7 +53,6 @@ namespace KesselRun.Web.Api
                 .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions)
                 .AddFluentValidation(fv => fv.ValidatorFactory = new SiteFluentValidatorFactory(Container));
 
-
             var openApiInfos = GetOpenApiInfo("swaggerconfig.json");
             Versions = openApiInfos.Select(i => i.Version); // stash this for use in the Configure method below.
             services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, openApiInfos);
