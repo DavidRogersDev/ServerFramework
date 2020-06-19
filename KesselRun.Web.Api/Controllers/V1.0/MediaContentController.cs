@@ -1,4 +1,7 @@
-﻿using KesselRun.Web.Api.Messaging.Queries;
+﻿using System.Net.Mime;
+using System.Threading.Tasks;
+using KesselRun.Business.DataTransferObjects;
+using KesselRun.Web.Api.Messaging.Queries;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Controllers;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
@@ -7,40 +10,34 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Net.Mime;
-using System.Threading.Tasks;
 
 namespace KesselRun.Web.Api.Controllers.V1._0
 {
     [ApiVersion(Swagger.Versions.v1_0)]
     [Route(AspNet.Mvc.DefaultControllerTemplate)]
     [Produces(MediaTypeNames.Application.Json)]
-    public class ColorsController : KesselRunApiController
+    public class MediaContentController : KesselRunApiController
     {
-        public ColorsController(
-            ICurrentUser currentUser,
-            ILogger logger,
-            IMediator mediator)
+        public MediaContentController(ICurrentUser currentUser, ILogger logger, IMediator mediator) 
             : base(currentUser, logger, mediator)
         {
-
         }
 
         [HttpGet]
         [Route(AspNet.Mvc.ActionTemplate)]
         [MapToApiVersion(Swagger.Versions.v1_0)]
-        //[ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_0)]
+        [ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_0)]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetColors()
+        public async Task<IActionResult> GetTvShow([FromQuery]TvShowPayloadDto tvShowPayload)
         {
-            var colors = await _mediator.Send(new GetColorsQuery());
+            var tvShow = await _mediator.Send(new GetTvShowQuery { Season = tvShowPayload.Season, Title = tvShowPayload.Title });
 
-            return colors.Match(
-                result => OkResponse(colors.LeftOrDefault()), 
-                error => BadRequestResponse(string.Empty, OperationOutcome.ValidationFailOutcome(colors.RightOrDefault().Errors.Select(e => e.ErrorMessage)))                
-                );
+            return tvShow.Match(
+                t => OkResponse(tvShow.LeftOrDefault()),
+                p => InternalServerErrorResponse(tvShow.RightOrDefault(), OperationOutcome.UnSuccessfulOutcome)
+            );
+
         }
     }
 }

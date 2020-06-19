@@ -5,6 +5,6 @@ namespace KesselRunFramework.Core
 {
     public interface IApplicationDataService
     {
-        IDbFoundary DbFoundary { get; }
+        IDbResolver DbResolver { get; }
     }
 }

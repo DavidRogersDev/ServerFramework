@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
 
@@ -15,20 +16,15 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
         public static void ConfigureAppServices(this IServiceCollection services, IWebHostEnvironment env, Container container)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
-            if (env == null) throw new ArgumentNullException(nameof(env));
-            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (env == null) throw new ArgumentNullException(nameof(env));            
 
             // For ASP.NET centric stuff, regester it with the framework container i.e. IServiceCollection
             services.AddHttpContextAccessor();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            services.AddHttpClient(); // this registers IHttpClientFactory, which we inject into some services to get HttpClients.
-
+            
             services.AddScoped<ICurrentUser, CurrentUserAdapter>();
             services.AddScoped<ApiExceptionFilter>();
-
-            //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
 
             services.AddSimpleInjector(container, options =>
             {
@@ -38,12 +34,20 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                     // Simple Injector instead of the built-in configuration system.
                     .AddControllerActivation();
 
-                options.AddLogging(); // <-- This registers all logging abstractions                
+                services.AddScoped<ILogger>(c => container.GetInstance<ILogger>());
+
+                options.AddLogging(); // <-- This registers all logging abstractions      
+                
+
+                // Important for things like Http clients which are owned by the ServicesCollection but get
+                // injected into things like MediatR request handlers, which use SimpleInjector for its IOC needs. 
+                options.AutoCrossWireFrameworkComponents = true; 
 
                 //.AddViewComponentActivation()
                 //.AddPageModelActivation()
                 //.AddTagHelperActivation();                
             });
+
         }
     }
 }

@@ -6,18 +6,18 @@ namespace KesselRunFramework.DataAccess.Ops
 {
     public class SimpleListRetriever : ISimpleListRetriever
     {
-        private readonly IDbFoundary _dbFoundary;
+        private readonly IDbResolver _dbResolver;
 
-        public SimpleListRetriever(IDbFoundary dbFoundary)
+        public SimpleListRetriever(IDbResolver dbResolver)
         {
-            _dbFoundary = dbFoundary;
+            _dbResolver = dbResolver;
         }
 
         public IEnumerable<ISimpleListItem> GetSimpleList(DbParameter [] parameters, string query)
         {
             var simpleList = new HashSet<ISimpleListItem>();
             
-            using (var dataReader = _dbFoundary.GetDbConnectionManager().GetOpenConnection().ExecuteCommandQuery(parameters, query))
+            using (var dataReader = _dbResolver.GetDbConnectionManager().GetOpenConnection().ExecuteCommandQuery(parameters, query))
             {
                 while (dataReader.Read())
                 {

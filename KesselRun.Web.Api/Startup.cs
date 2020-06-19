@@ -2,20 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using KesselRun.Business.DataTransferObjects;
+using KesselRun.Web.Api.HttpClients;
 using KesselRun.Web.Api.Infrastructure.Ioc;
 using KesselRun.Web.Api.Infrastructure.Mapping;
 using KesselRunFramework.AspNet.Infrastructure.ActionFilters;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc;
+using KesselRunFramework.AspNet.Infrastructure.HttpClient;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
 using KesselRunFramework.AspNet.Messaging.Pipelines;
 using KesselRunFramework.AspNet.Middleware;
 using KesselRunFramework.AspNet.Validation;
 using KesselRunFramework.Core.Infrastructure.Extensions;
+using KesselRunFramework.Core.Infrastructure.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -35,11 +39,14 @@ namespace KesselRun.Web.Api
         {
             Configuration = configuration;
             WebHostEnvironment = webHostEnvironment;
+            Assemblies = GetAssemblies();
         }
 
         public IConfiguration Configuration { get; }
         public IEnumerable<string> Versions { get; set; }
         public IWebHostEnvironment WebHostEnvironment { get; }
+        public IEnumerable<Type> ExportedTypesWebAssembly { get; set; }
+        IDictionary<string, Assembly> Assemblies { get; set; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -57,6 +64,15 @@ namespace KesselRun.Web.Api
             Versions = openApiInfos.Select(i => i.Version); // stash this for use in the Configure method below.
             services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, openApiInfos);
             services.ConfigureAppServices(WebHostEnvironment, Container);
+
+            //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
+
+            ExportedTypesWebAssembly = Assemblies[StartUp.Executing].GetExportedTypes();
+
+            var httpClientTypes = ExportedTypesWebAssembly
+                    .Where(t => t.IsClass && typeof(ITypedHttpClient).IsAssignableFrom(t));
+
+            services.RegisterTypedHttpClients(httpClientTypes);
         }
 
 
@@ -92,7 +108,7 @@ namespace KesselRun.Web.Api
 
         private void RegisterApplicationServices()
         {
-            var assemblies = GetAssemblies();
+            Container.RegisterSingleton<ITypedClientResolver, TypedClientResolver>();
 
             Container.RegisterValidationAbstractions(new[] { assemblies[StartUp.Executing], assemblies[StartUp.Domain] });
             Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(assemblies));

@@ -5,13 +5,13 @@ namespace KesselRunFramework.Core
 {
     public abstract class ApplicationDataService : IApplicationDataService
     {
-        protected ApplicationDataService(IDbFoundary dbFoundary, IMapper mapper)
+        protected ApplicationDataService(IDbResolver dbResolver, IMapper mapper)
         {
-            DbFoundary = dbFoundary;
+            DbResolver = dbResolver;
             Mapper = mapper;
         }
 
-        public IDbFoundary DbFoundary { get; }
+        public IDbResolver DbResolver { get; }
         public IMapper Mapper { get; }
     }
 }

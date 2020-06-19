@@ -41,6 +41,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            if (versions == null) throw new ArgumentNullException(nameof(versions));
 
             if (hostingEnvironment.IsDevelopmentOrIsStaging())
             {

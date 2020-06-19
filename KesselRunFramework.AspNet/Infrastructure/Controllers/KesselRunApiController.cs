@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using KesselRunFramework.AspNet.Response;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -23,13 +24,13 @@ namespace KesselRunFramework.AspNet.Infrastructure.Controllers
 
         public IActionResult OkResponse<T>(T data, string message = null)
         {
+            var outcome = OperationOutcome.SuccessfulOutcome;
+            outcome.Message = message ?? string.Empty;
+
             var apiResponse = new ApiResponse<T>
             {
                 Data = data,
-                Outcome = new OperationOutcome
-                {
-                    Message = message ?? string.Empty, OpResult = OpResult.Success
-                }
+                Outcome = outcome
             };
 
             return Ok(apiResponse);
@@ -53,19 +54,17 @@ namespace KesselRunFramework.AspNet.Infrastructure.Controllers
 
         public IActionResult BadRequestResponse<T>(T data, string errorMessage = null, IEnumerable<string> errors = null)
         {
+            var outcome = OperationOutcome.ValidationFailOutcome(errors, errorMessage);
+
             var apiResponse = new ApiResponse<T>
             {
                 Data = data,
-                Outcome = new OperationOutcome
-                {
-                    Errors = errors ?? Enumerable.Empty<string>(),
-                    Message = errorMessage ?? string.Empty,
-                    OpResult = OpResult.Fail
-                }
+                Outcome = outcome
             };
 
             return BadRequest(apiResponse);
         }
+
         public IActionResult BadRequestResponse<T>(T data, OperationOutcome operationOutcome)
         {
             var apiResponse = new ApiResponse<T>
@@ -80,6 +79,66 @@ namespace KesselRunFramework.AspNet.Infrastructure.Controllers
         public IActionResult BadRequestResponse<T>(ApiResponse<T> apiResponse)
         {
             return BadRequest(apiResponse);
+        }
+
+        public IActionResult UnprocessableEntityResponse<T>(T data, string errorMessage = null, IEnumerable<string> errors = null)
+        {
+            var outcome = OperationOutcome.ValidationFailOutcome(errors, errorMessage);
+
+            var apiResponse = new ApiResponse<T>
+            {
+                Data = data,
+                Outcome = outcome
+            };
+
+            return StatusCode((int)HttpStatusCode.UnprocessableEntity, apiResponse);
+        }
+
+        public IActionResult UnprocessableEntityResponse<T>(T data, OperationOutcome operationOutcome)
+        {
+            var apiResponse = new ApiResponse<T>
+            {
+                Data = data,
+                Outcome = operationOutcome
+            };
+
+            return StatusCode((int)HttpStatusCode.UnprocessableEntity, apiResponse);
+        }
+
+        public IActionResult UnprocessableEntityResponse<T>(ApiResponse<T> apiResponse)
+        {
+            return StatusCode((int)HttpStatusCode.UnprocessableEntity, apiResponse);
+        }
+
+        public IActionResult InternalServerErrorResponse<T>(T data, string errorMessage = null, IEnumerable<string> errors = null)
+        {
+            var outcome = OperationOutcome.UnSuccessfulOutcome;
+            outcome.Errors = errors ?? Enumerable.Empty<string>();
+            outcome.Message = errorMessage ?? string.Empty;
+
+            var apiResponse = new ApiResponse<T>
+            {
+                Data = data,
+                Outcome = outcome
+            };
+
+            return StatusCode((int)HttpStatusCode.InternalServerError, apiResponse);
+        }
+
+        public IActionResult InternalServerErrorResponse<T>(T data, OperationOutcome operationOutcome)
+        {
+            var apiResponse = new ApiResponse<T>
+            {
+                Data = data,
+                Outcome = operationOutcome
+            };
+
+            return StatusCode((int)HttpStatusCode.InternalServerError, apiResponse);
+        }
+
+        public IActionResult InternalServerErrorResponse<T>(ApiResponse<T> apiResponse)
+        {
+            return StatusCode((int)HttpStatusCode.InternalServerError, apiResponse);
         }
     }
 }
