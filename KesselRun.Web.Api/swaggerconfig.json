@@ -1,0 +1,24 @@
+{
+  "OpenApiInfo": [
+    {
+      "Contact": {
+        "Name": "Dave",
+        "Email": "dave@incontrol.com"
+      },
+      "Description": "An API to serve the Abatements application.",
+      "TermsOfService": "https://google.com",
+      "Title": "Abatements API",
+      "Version": "1.0"
+    },
+    {
+      "Contact": {
+        "Name": "Dan",
+        "Email": "Dan@incontrol.com"
+      },
+      "Description": "An API to serve the Abatements application.",
+      "TermsOfService": "https://smh.com.au",
+      "Title": "Abatements API",
+      "Version": "1.1"
+    }
+  ]
+}
