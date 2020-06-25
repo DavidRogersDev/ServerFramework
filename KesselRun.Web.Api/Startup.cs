@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -46,23 +47,16 @@ namespace KesselRun.Web.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(
-                    c =>
-                    {
-                        c.Filters.Add(typeof(SerilogMvcLoggingAttribute));
-                        c.Filters.Add(typeof(ApiExceptionFilter));
-                    })
+            services.AddControllers(MvcConfigurer.ConfigureMvcOptions)
                 .ConfigureApiBehaviorOptions(ApiBehaviourConfigurer.ConfigureApiBehaviour)
                 .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions)
-                .AddFluentValidation(fv => fv.ValidatorFactory = new SiteFluentValidatorFactory(Container));
+                .AddFluentValidation(FluentValidationConfigurer.ConfigureFluentValidation(Container));
 
             var openApiInfos = GetOpenApiInfo("swaggerconfig.json");
             Versions = openApiInfos.Select(i => i.Version); // stash this for use in the Configure method below.
             services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, openApiInfos);
             services.ConfigureAppServices(WebHostEnvironment, Container);
-
-            //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
-
+            
             ExportedTypesWebAssembly = Assemblies[StartUp.Executing].GetExportedTypes();
 
             var httpClientTypes = ExportedTypesWebAssembly
@@ -78,7 +72,7 @@ namespace KesselRun.Web.Api
 
             RegisterApplicationServices();
 
-            app.ConfigureMiddlewareForEnvironments(env);
+            app.ConfigureMiddlewareForEnvironments(env, Container);
 
             app.UseApiExceptionHandler(opts =>
             {

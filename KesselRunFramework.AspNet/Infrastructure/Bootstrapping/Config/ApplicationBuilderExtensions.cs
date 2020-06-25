@@ -7,11 +7,14 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 {
     public static class ApplicationBuilderExtensions
     {
-        public static void ConfigureMiddlewareForEnvironments(this IApplicationBuilder app, IWebHostEnvironment env)
+        public static void ConfigureMiddlewareForEnvironments(this IApplicationBuilder app, 
+            IWebHostEnvironment env,
+            Container container)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                container.Verify();
             }
             else
             {
@@ -36,8 +39,6 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                 
                 //options.UseLocalization();
             });
-
         }
-
     }
 }
