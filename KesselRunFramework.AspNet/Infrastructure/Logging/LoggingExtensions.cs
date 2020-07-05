@@ -7,6 +7,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
     {
         private static readonly Action<ILogger, Exception> BeforeValidatingMessageTrace;
         private static readonly Action<ILogger, string, string, Exception> InvalidMessageTrace;
+        private static readonly Action<ILogger, string, string, string, Exception> ModelBinderUsed;
         private static readonly Action<ILogger, long, Exception> ProfileMessagingTrace;
         private static readonly Action<ILogger, Exception> ValidMessageTrace;
 
@@ -32,6 +33,12 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
                 PipelineBehaviour + " Invalid Message. {message}. User: {user}."
                 );
 
+            ModelBinderUsed = LoggerMessage.Define<string, string, string>(
+                LogLevel.Debug,
+                new EventId((int)TraceEventIdentifiers.ModelBinderUsedTrace, nameof(TraceMessageModelBinderUsed)),
+                "Parameter '{modelName}' of type '{type}' bound using ModelBinder \"{modelBinder}\"."
+            );
+
             ValidMessageTrace = LoggerMessage.Define(
                 LogLevel.Debug,
                 new EventId((int)TraceEventIdentifiers.ValidMessageTrace, nameof(TraceMessageValidationPassed)),
@@ -52,6 +59,11 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
         public static void TraceBeforeValidatingMessage(this ILogger logger)
         {
             BeforeValidatingMessageTrace(logger, null);
+        }
+
+        public static void TraceMessageModelBinderUsed(this ILogger logger, string parameter, string type, string modelBinder)
+        {
+            ModelBinderUsed(logger, parameter, type, modelBinder, null);
         }
 
         public static void TraceMessageValidationPassed(this ILogger logger)
