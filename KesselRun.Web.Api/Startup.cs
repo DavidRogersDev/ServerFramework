@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using KesselRun.Business.DataTransferObjects;
-using KesselRun.Web.Api.HttpClients;
-using KesselRun.Web.Api.Infrastructure.Ioc;
 using KesselRun.Web.Api.Infrastructure.Mapping;
 using KesselRunFramework.AspNet.Infrastructure.ActionFilters;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config;
@@ -24,6 +20,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using SimpleInjector;
 
@@ -41,27 +40,23 @@ namespace KesselRun.Web.Api
         }
 
         public IConfiguration Configuration { get; }
+        public IEnumerable<string> Versions { get; set; }
         public IWebHostEnvironment WebHostEnvironment { get; }
         public IEnumerable<Type> ExportedTypesWebAssembly { get; set; }
         IDictionary<string, Assembly> Assemblies { get; set; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(
-                    c =>
-                    {
-                        c.Filters.Add(typeof(SerilogMvcLoggingAttribute));
-                        c.Filters.Add(typeof(ApiExceptionFilter));
-                    })
+            services.AddControllers(MvcConfigurer.ConfigureMvcOptions)
                 .ConfigureApiBehaviorOptions(ApiBehaviourConfigurer.ConfigureApiBehaviour)
                 .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions)
-                .AddFluentValidation(fv => fv.ValidatorFactory = new SiteFluentValidatorFactory(Container));
+                .AddFluentValidation(FluentValidationConfigurer.ConfigureFluentValidation(Container));
 
-            services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, new []{ Swagger.DocVersions.v1_0, Swagger.DocVersions.v1_1});
+            var openApiInfos = GetOpenApiInfo("swaggerconfig.json");
+            Versions = openApiInfos.Select(i => i.Version); // stash this for use in the Configure method below.
+            services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, openApiInfos);
             services.ConfigureAppServices(WebHostEnvironment, Container);
-
-            //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle(); // This is default anyway
-
+            
             ExportedTypesWebAssembly = Assemblies[StartUp.Executing].GetExportedTypes();
 
             var httpClientTypes = ExportedTypesWebAssembly
@@ -77,7 +72,7 @@ namespace KesselRun.Web.Api
 
             RegisterApplicationServices();
 
-            app.ConfigureMiddlewareForEnvironments(env);
+            app.ConfigureMiddlewareForEnvironments(env, Container);
 
             app.UseApiExceptionHandler(opts =>
             {
@@ -89,7 +84,7 @@ namespace KesselRun.Web.Api
 
             app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = RequestLoggingConfigurer.EnrichFromRequest);
 
-            app.UseSwaggerInDevAndStaging(WebHostEnvironment, new []{ Swagger.DocVersions.v1_0, Swagger.DocVersions.v1_1});
+            app.UseSwaggerInDevAndStaging(WebHostEnvironment, Versions.ToArray());
 
             app.UseRouting();
 
@@ -139,15 +134,29 @@ namespace KesselRun.Web.Api
 
             return assemblies;
         }
-
-        [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
+        
         private static Profile[] GetAutoMapperProfiles(IDictionary<string, Assembly> configurationAssemblies)
         {
-            var abatementsApiProfile = new KesselRunApiProfile("KesselRunApiProfile");
-            abatementsApiProfile.InitializeMappings(configurationAssemblies[StartUp.Domain].InArray());
+            var kesselRunApiProfile = new KesselRunApiProfile("KesselRunApiProfile");
+            kesselRunApiProfile.InitializeMappings(configurationAssemblies[StartUp.Domain].InArray());
 
-            return abatementsApiProfile.InArray();
+            return kesselRunApiProfile.InArray();
         }
 
+        private static IList<OpenApiInfo> GetOpenApiInfo(string swaggerSettingsFile)
+        {
+            var swaggerConfiguration = new ConfigurationBuilder()
+                .SetBasePath(Program.BasePath)
+                .AddJsonFile(swaggerSettingsFile)
+                .Build();
+
+            var services = new ServiceCollection();
+            services.AddSingleton<List<OpenApiInfo>>(p => p.GetRequiredService<IOptions<List<OpenApiInfo>>>().Value);
+            services.Configure<List<OpenApiInfo>>(options => swaggerConfiguration.GetSection(nameof(OpenApiInfo)).Bind(options));
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            return serviceProvider.GetService<List<OpenApiInfo>>();
+        }
     }
 }

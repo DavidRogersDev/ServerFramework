@@ -40,6 +40,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (automapperProfiles == null) throw new ArgumentNullException(nameof(automapperProfiles));
 
+            container.Register<MapperProvider>(Lifestyle.Singleton);
             container.RegisterSingleton(() => GetMapper(container, automapperProfiles));
         }
 

@@ -3,15 +3,14 @@ using KesselRunFramework.DataAccess;
 
 namespace KesselRunFramework.Core
 {
-    public abstract class ApplicationDataService : IApplicationDataService
+    public abstract class ApplicationDataService : ApplicationService, IApplicationDataService
     {
         protected ApplicationDataService(IDbResolver dbResolver, IMapper mapper)
+            : base(mapper)
         {
             DbResolver = dbResolver;
-            Mapper = mapper;
         }
 
         public IDbResolver DbResolver { get; }
-        public IMapper Mapper { get; }
     }
 }

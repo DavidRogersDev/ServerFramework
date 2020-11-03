@@ -18,11 +18,11 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 {
     public static class VersioningExtensions
     {
-        public static IServiceCollection AddAppApiVersioning(this IServiceCollection services, Action<ApiVersioningOptions> apiVersioningOptionsAction = null)
+        public static IServiceCollection AddAppApiVersioning(this IServiceCollection services, Action<ApiVersioningOptions> options = null)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            services.AddApiVersioning(apiVersioningOptionsAction ?? (o =>
+            services.AddApiVersioning(options ?? (o =>
             {
                 o.DefaultApiVersion = new ApiVersion(StartUp.MajorVersion1, StartUp.MinorVersion0); // specify the default api version
                 o.AssumeDefaultVersionWhenUnspecified = true; // assume that the caller wants the default version if they don't specify
@@ -32,24 +32,23 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             return services;
         }
 
-        public static IServiceCollection AddSwagger(this IServiceCollection services, 
+        public static IServiceCollection AddSwagger(this IServiceCollection services,
             IWebHostEnvironment hostingEnvironment, 
-            IConfiguration configuration,
-            string[] versions)
+            IConfiguration configuration, 
+            IList<OpenApiInfo> openApiInfos)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-            if (versions == null) throw new ArgumentNullException(nameof(versions));
 
             if (hostingEnvironment.IsDevelopmentOrIsStaging())
             {
                 services.AddSwaggerGen(c =>
                 {
-                    /******************* Add versions *******************/
-                    for (int i = 0; i < versions.Length; i++)
+                    for (int i = 0; i < openApiInfos.Count; i++)
                     {
-                        c.SwaggerDoc(versions[i], CreateInfoForApiVersion(configuration, versions[i]));
+                        var name = string.Concat(Swagger.Versions.VersionPrefix, openApiInfos[i].Version);
+                        c.SwaggerDoc(name, openApiInfos[i]);
                     }
 
                     c.OperationFilter<RemoveVersionFromParameterFilter>();
@@ -72,8 +71,8 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                             .SelectMany(attr => attr.Versions)
                             .ToArray();
 
-                        return versions.Any(v => $"v{v.ToString()}" == docName) 
-                               && (maps.Length == 0 || maps.Any(v => $"v{v.ToString()}" == docName));
+                        return versions.Any(v => $"{Swagger.Versions.VersionPrefix}{v.ToString()}" == docName) 
+                               && (maps.Length == 0 || maps.Any(v => $"{Swagger.Versions.VersionPrefix}{v.ToString()}" == docName));
                     });
                     
                     c.AddSecurityDefinition(Invariants.Identity.Bearer, new OpenApiSecurityScheme
@@ -124,31 +123,12 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                         for (int i = 0; i < versions.Length; i++)
                         {
                             c.SwaggerEndpoint(
-                                Swagger.EndPoint.Url.FormatAs(versions[i]),
-                                Swagger.EndPoint.Name.FormatAs(versions[i])
+                                Swagger.EndPoint.Url.FormatAs(string.Concat(Swagger.Versions.VersionPrefix, versions[i])),
+                                Swagger.EndPoint.Name.FormatAs(string.Concat(Swagger.Versions.VersionPrefix, versions[i]))
                             );
                         }
                     });
             }
-        }
-
-
-        private static OpenApiInfo CreateInfoForApiVersion(IConfiguration configuration, string version)
-        {
-            var info = new OpenApiInfo
-            {
-                Version = version,
-                Title = Swagger.Info.Title,
-                Description = Swagger.Info.Description,
-                //TermsOfService = new Uri("https://example.com/terms"),
-                Contact = new OpenApiContact
-                {
-                    Name = Swagger.Info.ContactName,
-                    Email = Swagger.Info.ContactEmail
-                }
-            };
-
-            return info;
         }
     }
 }

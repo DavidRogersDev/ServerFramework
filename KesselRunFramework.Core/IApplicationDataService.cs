@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using KesselRunFramework.DataAccess;
+﻿using KesselRunFramework.DataAccess;
 
 namespace KesselRunFramework.Core
 {
