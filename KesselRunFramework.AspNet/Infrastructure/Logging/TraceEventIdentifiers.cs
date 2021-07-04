@@ -5,6 +5,7 @@
         ProfileMessagingTrace = 50,
         BeforeValidatingMessageTrace = 51,
         InValidMessageTrace = 52,
-        ValidMessageTrace = 53
+        ValidMessageTrace = 53,
+        ModelBinderUsedTrace = 54
     }
 }
