@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using FluentValidation;
-using KesselRunFramework.AspNet.Validation;
+using InControl.Framework.AspNet.Validation;
 using SimpleInjector;
 
 namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc

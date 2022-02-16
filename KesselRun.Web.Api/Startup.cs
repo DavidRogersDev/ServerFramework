@@ -5,6 +5,7 @@ using System.Reflection;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using KesselRun.Business.DataTransferObjects;
+using KesselRun.Business.Validation;
 using KesselRun.Web.Api.Infrastructure.Mapping;
 using KesselRunFramework.AspNet.Infrastructure.ActionFilters;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config;
@@ -50,7 +51,9 @@ namespace KesselRun.Web.Api
             services.AddControllers(MvcConfigurer.ConfigureMvcOptions)
                 .ConfigureApiBehaviorOptions(ApiBehaviourConfigurer.ConfigureApiBehaviour)
                 .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions)
-                .AddFluentValidation(FluentValidationConfigurer.ConfigureFluentValidation(Container));
+                .AddFluentValidation(fv => 
+                    fv.RegisterValidatorsFromAssemblyContaining<ColorCollectionValidator>(lifetime: ServiceLifetime.Singleton)
+                    );
 
             var openApiInfos = GetOpenApiInfo("swaggerconfig.json");
             Versions = openApiInfos.Select(i => i.Version); // stash this for use in the Configure method below.

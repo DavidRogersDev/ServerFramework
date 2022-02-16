@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
-using FluentValidation.Results;
+using ValidationResult = FluentValidation.Results.ValidationResult;
 
-namespace KesselRunFramework.AspNet.Validation
+namespace InControl.Framework.AspNet.Validation
 {
     public class CompositeValidator<T> : IValidator<T>
     {
@@ -15,6 +15,46 @@ namespace KesselRunFramework.AspNet.Validation
         public CompositeValidator(IEnumerable<IValidator<T>> validators)
         {
             _validators = validators;
+        }
+
+        public CascadeMode CascadeMode { get; set; }
+
+        public ValidationResult Validate(IValidationContext context)
+        {
+            var validationResults = new HashSet<ValidationResult>();
+
+            foreach (var validator in _validators)
+            {
+                var res = validator.Validate(context);
+                validationResults.Add(res);
+            }
+
+            return new ValidationResult(validationResults.SelectMany(vr => vr.Errors));
+        }
+
+        public async Task<ValidationResult> ValidateAsync(IValidationContext context, CancellationToken cancellation = new CancellationToken())
+        {
+            var validationTasks = new List<Task<ValidationResult>>();
+
+            foreach (var validator in _validators)
+            {
+                var validationTask = validator.ValidateAsync(context, cancellation);
+                validationTasks.Add(validationTask);
+            }
+
+            var validationResults = await Task.WhenAll(validationTasks);
+
+            return new ValidationResult(validationResults.SelectMany(vr => vr.Errors));
+        }
+
+        public IValidatorDescriptor CreateDescriptor()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CanValidateInstancesOfType(Type type)
+        {
+            throw new NotImplementedException();
         }
 
         public ValidationResult Validate(T instance)
@@ -30,71 +70,15 @@ namespace KesselRunFramework.AspNet.Validation
 
         public async Task<ValidationResult> ValidateAsync(T instance, CancellationToken cancellation = new CancellationToken())
         {
-            IList<ValidationResult> validationResults = new List<ValidationResult>();
+            var validationTasks = new List<Task<ValidationResult>>();
 
             foreach (var validator in _validators)
             {
-                var res = await validator.ValidateAsync(instance, cancellation);
-                validationResults.Add(res);
+                var validationTask = validator.ValidateAsync(instance, cancellation);
+                validationTasks.Add(validationTask);
             }
 
-            return new ValidationResult(validationResults.SelectMany(vr => vr.Errors));
-        }
-
-        public CascadeMode CascadeMode { get; set; }
-
-        public ValidationResult Validate(object instance)
-        {
-            return ValidatePrivate(instance);
-        }
-
-        public async Task<ValidationResult> ValidateAsync(object instance, CancellationToken cancellation = new CancellationToken())
-        {
-            return await ValidateAsyncPrivate(instance, cancellation);
-        }
-
-        public ValidationResult Validate(ValidationContext context)
-        {
-            return ValidatePrivate(context.InstanceToValidate);
-        }
-
-        public async Task<ValidationResult> ValidateAsync(ValidationContext context, CancellationToken cancellation = new CancellationToken())
-        {
-            return await ValidateAsyncPrivate(context.InstanceToValidate, cancellation);
-        }
-
-        public IValidatorDescriptor CreateDescriptor()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CanValidateInstancesOfType(Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        private ValidationResult ValidatePrivate(object instance)
-        {
-            var validationResults = new HashSet<ValidationResult>();
-
-            foreach (var validator in _validators)
-            {
-                var res = validator.Validate(instance);
-                validationResults.Add(res);
-            }
-
-            return new ValidationResult(validationResults.SelectMany(vr => vr.Errors));
-        }
-
-        private async Task<ValidationResult> ValidateAsyncPrivate(object instance, CancellationToken cancellation = new CancellationToken())
-        {
-            IList<ValidationResult> validationResults = new List<ValidationResult>();
-
-            foreach (var validator in _validators)
-            {
-                var res = await validator.ValidateAsync(instance, cancellation);
-                validationResults.Add(res);
-            }
+            var validationResults = await Task.WhenAll(validationTasks);
 
             return new ValidationResult(validationResults.SelectMany(vr => vr.Errors));
         }
