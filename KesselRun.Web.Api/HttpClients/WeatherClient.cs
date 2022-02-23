@@ -29,7 +29,7 @@ namespace KesselRun.Web.Api.HttpClients
             HttpClient.BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/weather");
             UriBuilder = new UriBuilder(HttpClient.BaseAddress);
             QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
-            QueryStringParams["appid"] = "";
+            QueryStringParams["appid"] = "395ba5d4531fb30d0e3487bd015e2a6c"; // your app id goes here.
         }
 
         public async Task<WeatherDto> GetWeather(CancellationToken cancellationToken)
@@ -49,13 +49,16 @@ namespace KesselRun.Web.Api.HttpClients
                     {
                         if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
                         {
-                            var errorStream = await response.Content.ReadAsStreamAsync();
+                            var errorStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+                            // Do something with errors here. The following code is just a guide and incomplete
+
                             using (var streamReader = new StreamReader(errorStream, Encoding.UTF8, true))
                             {
                                 using (var jsonTextReader = new JsonTextReader(streamReader))
                                 {
                                     var jsonSerializer = new JsonSerializer();
-                                    var validationErrors = jsonSerializer.Deserialize(jsonTextReader);
+                                    var validationErrors = jsonSerializer.Deserialize(jsonTextReader); 
                                 }
                             }
                         }
@@ -63,7 +66,7 @@ namespace KesselRun.Web.Api.HttpClients
 
                     response.EnsureSuccessStatusCode();
 
-                    var stream = await response.Content.ReadAsStreamAsync();
+                    var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
                     weather = stream.ReadAndDeserializeFromJson<WeatherDto>();
                 }
             }
