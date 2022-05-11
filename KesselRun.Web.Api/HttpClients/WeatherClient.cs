@@ -9,10 +9,8 @@ using System.Web;
 using KesselRun.Business.DataTransferObjects.Weather;
 using KesselRunFramework.AspNet.Infrastructure.HttpClient;
 using KesselRunFramework.Core.Infrastructure.Errors;
-using KesselRunFramework.Core.Infrastructure.Extensions;
 using KesselRunFramework.Core.Infrastructure.Logging;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace KesselRun.Web.Api.HttpClients
 {
@@ -29,7 +27,7 @@ namespace KesselRun.Web.Api.HttpClients
             HttpClient.BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/weather");
             UriBuilder = new UriBuilder(HttpClient.BaseAddress);
             QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
-            QueryStringParams["appid"] = ""; // your app id goes here.
+            QueryStringParams["appid"] = "395ba5d4531fb30d0e3487bd015e2a6c"; // your app id goes here.
         }
 
         public async Task<WeatherDto> GetWeather(CancellationToken cancellationToken)
@@ -55,10 +53,10 @@ namespace KesselRun.Web.Api.HttpClients
 
                             using (var streamReader = new StreamReader(errorStream, Encoding.UTF8, true))
                             {
-                                using (var jsonTextReader = new JsonTextReader(streamReader))
+                                //using (var jsonTextReader = new JsonTextReader(streamReader))
                                 {
-                                    var jsonSerializer = new JsonSerializer();
-                                    var validationErrors = jsonSerializer.Deserialize(jsonTextReader); 
+                                    //var jsonSerializer = new JsonSerializer();
+                                    //'var validationErrors = await JsonSerializer.DeserializeAsync(errorStream);
                                 }
                             }
                         }
@@ -67,7 +65,7 @@ namespace KesselRun.Web.Api.HttpClients
                     response.EnsureSuccessStatusCode();
 
                     var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-                    weather = stream.ReadAndDeserializeFromJson<WeatherDto>();
+                    weather = await DeserializeAsync<WeatherDto>(stream);
                 }
             }
             catch (Exception exception)

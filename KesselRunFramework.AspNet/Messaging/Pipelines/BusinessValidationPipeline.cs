@@ -54,6 +54,8 @@ namespace KesselRunFramework.AspNet.Messaging.Pipelines
 
                     return invalidResponse;
                 }
+                
+                throw new Exception("IValidateable implementation must be a generic type.");
             }
 
             _logger.TraceMessageValidationPassed();

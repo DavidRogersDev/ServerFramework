@@ -1,19 +1,14 @@
 ﻿using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using KesselRunFramework.AspNet.Response;
-using KesselRunFramework.Core.Infrastructure.Invariants;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.Generic;
 
 namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping
 {
     public class Common
     {
-        public static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
-        {
-            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        };
+        public static  JsonSerializerOptions JsonSerializerOptions { get; set; }
 
         public static ApiResponse<BadRequest400Payload> ProcessInvalidModelState(ModelStateDictionary modelState)
         {
@@ -25,19 +20,24 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping
 
             var payload = new ApiResponse<BadRequest400Payload>
             {
-                Data = new BadRequest400Payload
-                {
-                    Errors = errors
-                },
-                Outcome = OperationOutcome.ValidationFailOutcome(errors.SelectMany(
-                    keyValuePair => keyValuePair.Value
-                        .Select(
-                            str => string.Concat(keyValuePair.Key, GeneralPurpose.UniqueDelimiter, str)
-                        )
-                ))
+                Data = null,
+                Outcome = OperationOutcome.ValidationFailOutcome(errors)
             };
 
             return payload;
+        }
+
+        public static Dictionary<string, IEnumerable<string>> GetErrorsFromModelState(ModelStateDictionary modelState)
+        {
+            var errors =
+                modelState
+                    .Where(m => m.Value.Errors.Any())
+                    .ToDictionary(
+                        k => k.Key,
+                        v => v.Value.Errors.Select(e => e.ErrorMessage)
+                    );
+
+            return errors;
         }
     }
 }

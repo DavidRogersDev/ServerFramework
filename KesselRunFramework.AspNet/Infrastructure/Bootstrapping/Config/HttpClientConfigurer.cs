@@ -15,9 +15,9 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (types == null) throw new ArgumentNullException(nameof(types));
 
-            var enumerable = types as Type[] ?? types.ToArray();
+            var typesArray = types as Type[] ?? types.ToArray();
 
-            if (enumerable.Any())
+            if (typesArray.Any())
             {
                 var noOpPolicy = Policy.NoOpAsync().AsAsyncPolicy<HttpResponseMessage>();
 
@@ -30,17 +30,19 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                         TimeSpan.FromSeconds(8)
                     });
 
-                var addHttpClientMethod = typeof(HttpClientFactoryServiceCollectionExtensions).GetMethods().Single(
-                    m =>
-                        m.Name == "AddHttpClient" &&
-                        m.GetGenericArguments().Length == 1 &&
-                        m.GetParameters().Length == 1 &&
-                        m.GetParameters()[0].ParameterType == typeof(IServiceCollection)
-                );
+                var addHttpClientMethod = typeof(HttpClientFactoryServiceCollectionExtensions).GetMethods()
+                    .Single(
+                        m =>
+                            m.Name == "AddHttpClient" &&
+                            m.GetGenericArguments().Length == 1 &&
+                            m.GetParameters().Length == 1 &&
+                            m.GetParameters()[0].ParameterType == typeof(IServiceCollection)
+                    );
 
-                foreach (var type in enumerable)
+                for (int i = 0; i < typesArray.Length; i++)
                 {
-                    var genericMethod = addHttpClientMethod.MakeGenericMethod(type);
+                    var genericMethod = addHttpClientMethod.MakeGenericMethod(typesArray[i]);
+
                     var httpClientBuilder = (IHttpClientBuilder)genericMethod.Invoke(null, new[] { services });
 
                     httpClientBuilder.ConfigurePrimaryHttpMessageHandler(handler => new HttpClientHandler

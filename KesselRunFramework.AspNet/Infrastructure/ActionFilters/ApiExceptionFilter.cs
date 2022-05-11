@@ -89,7 +89,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.ActionFilters
 
             var wrappedPayload = new ApiResponse<IEnumerable<string>>
             {
-                Data = Enumerable.Empty<string>(),
+                Data = null,
                 Outcome = operationOutcome
             };
 

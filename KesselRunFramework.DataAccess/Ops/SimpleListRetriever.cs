@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 using KesselRunFramework.DataAccess.Domain;
+using Microsoft.Data.SqlClient;
 
 namespace KesselRunFramework.DataAccess.Ops
 {
@@ -13,19 +15,73 @@ namespace KesselRunFramework.DataAccess.Ops
             _dbResolver = dbResolver;
         }
 
-        public IEnumerable<ISimpleListItem> GetSimpleList(DbParameter [] parameters, string query)
+        public IEnumerable<ISimpleListItem> GetSimpleList(string query, SqlParameter[] parameters = null, bool? withNullCheck = null)
         {
             var simpleList = new HashSet<ISimpleListItem>();
-            
-            using (var dataReader = _dbResolver.GetDbConnectionManager().GetOpenConnection().ExecuteCommandQuery(parameters, query))
+            using (var conn = _dbResolver.GetDbConnectionManager().GetOpenConnection())
+            using (var dataReader = conn.ExecuteCommandQuery(query, parameters))
             {
-                while (dataReader.Read())
+                if (withNullCheck.HasValue && withNullCheck.Value)
                 {
-                    simpleList.Add(new SimpleListItemObject
+                    while (dataReader.Read())
                     {
-                        Id = dataReader.GetInt32(0),
-                        Name = dataReader.GetString(1)
-                    });
+                        if (dataReader.IsDBNull(0) || dataReader.IsDBNull(1))
+                            continue;
+
+                        simpleList.Add(new SimpleListItemObject
+                        {
+                            Id = dataReader.GetInt32(0), 
+                            Name = dataReader.GetString(1)
+                        });
+                    }
+                }
+                else
+                {
+                    while (dataReader.Read())
+                    {
+                        simpleList.Add(new SimpleListItemObject
+                        {
+                            Id = dataReader.GetInt32(0),
+                            Name = dataReader.GetString(1)
+                        });
+                    }
+                }
+            }
+
+            return simpleList;
+        }
+
+
+        public async Task<IEnumerable<ISimpleListItem>> GetSimpleListAsync(string query, CancellationToken cancellationToken, SqlParameter[] parameters = null, bool? withNullCheck = null)
+        {
+            var simpleList = new HashSet<ISimpleListItem>();
+            using (var conn = _dbResolver.GetDbConnectionManager().GetOpenConnection())
+            using (var dataReader = await conn.ExecuteCommandQueryAsync(query, cancellationToken, parameters))
+            {
+                if (withNullCheck.HasValue && withNullCheck.Value)
+                {
+                    while (dataReader.Read())
+                    {
+                        if (dataReader.IsDBNull(0) || dataReader.IsDBNull(1))
+                            continue;
+
+                        simpleList.Add(new SimpleListItemObject
+                        {
+                            Id = dataReader.GetInt32(0),
+                            Name = dataReader.GetString(1)
+                        });
+                    }
+                }
+                else
+                {
+                    while (dataReader.Read())
+                    {
+                        simpleList.Add(new SimpleListItemObject
+                        {
+                            Id = dataReader.GetInt32(0),
+                            Name = dataReader.GetString(1)
+                        });
+                    }
                 }
             }
 

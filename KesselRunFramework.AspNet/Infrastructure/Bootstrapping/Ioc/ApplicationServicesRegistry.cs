@@ -17,17 +17,29 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc
             if (applicationServicesFullNs == null) throw new ArgumentNullException(nameof(applicationServicesFullNs));
             if (applicationServicesFullNs.Trim().Equals(string.Empty)) throw new ArgumentException(nameof(applicationServicesFullNs) + " cannot be an empty string.");
 
-            const string applicationServicesInterface = nameof(IApplicationService);
-            const string applicationDataServicesInterface = nameof(IApplicationDataService);
+            var applicationServicesInterface = typeof(IApplicationService);
+            var applicationServicesInterfaceName = nameof(IApplicationService);
+            var applicationDataServicesInterface = typeof(IApplicationDataService);
+            var applicationDataServicesInterfaceName = nameof(IApplicationDataService);
 
             var applicationServices = assembly.GetExportedTypes()
-                .Where(t => t.Namespace != null
-                            && t.Namespace.StartsWith(applicationServicesFullNs, StringComparison.Ordinal))
-                .Where(t => t.GetInterfaces().Any() && !t.IsInterface)
+                .Where(t => applicationDataServicesInterface.IsAssignableFrom(t)
+                            || applicationServicesInterface.IsAssignableFrom(t)
+                            )
+                .Where(t => !t.IsInterface)
+                .Select(t => new 
+                    { 
+                        Type = t, 
+                        Interfaces = t.GetInterfaces() 
+                    })
+                .Where(t => t.Interfaces.Any())
                 .Select(type => new
                 {
-                    Service = type.GetInterfaces().First(i => i.Name != applicationServicesInterface && i.Name != applicationDataServicesInterface),
-                    Implementation = type
+                    Service = type.Interfaces.First(
+                        i => !i.Name.Equals(applicationServicesInterfaceName, StringComparison.Ordinal)
+                             && !i.Name.Equals(applicationDataServicesInterfaceName, StringComparison.Ordinal)
+                             ),
+                    Implementation = type.Type
                 });
 
             foreach (var applicationService in applicationServices)

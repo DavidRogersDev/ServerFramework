@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using KesselRun.Business.DataTransferObjects.Media;
+using KesselRunFramework.AspNet.Infrastructure.Bootstrapping;
 using KesselRunFramework.AspNet.Infrastructure.HttpClient;
 using KesselRunFramework.Core.Infrastructure.Extensions;
 using KesselRunFramework.Core.Infrastructure.Http;
@@ -21,7 +23,7 @@ namespace KesselRun.Web.Api.HttpClients
             HttpClient.BaseAddress = new Uri("https://www.omdbapi.com");
             UriBuilder = new UriBuilder(HttpClient.BaseAddress);
             QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
-            QueryStringParams["apikey"] = "";
+            QueryStringParams["apikey"] = "af2a3ba8";
         }
 
 
@@ -42,7 +44,8 @@ namespace KesselRun.Web.Api.HttpClients
                     response.EnsureSuccessStatusCode();
 
                     var stream = await response.Content.ReadAsStreamAsync();
-                    return stream.ReadAndDeserializeFromJson<TvShow>();
+
+                    return await DeserializeAsync<TvShow>(stream);
                 }
             }
             catch (Exception exception)

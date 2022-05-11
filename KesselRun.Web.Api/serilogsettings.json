@@ -9,7 +9,7 @@
       {
         "Name": "Console",
         "Args": {
-          "restrictedToMinimumLevel": "Information"
+          "restrictedToMinimumLevel": "Debug"
         } 
       },
       {

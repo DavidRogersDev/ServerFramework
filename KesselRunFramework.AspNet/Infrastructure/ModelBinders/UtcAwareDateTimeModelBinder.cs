@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using KesselRunFramework.AspNet.Infrastructure.Logging;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.Logging;
 
 namespace KesselRunFramework.AspNet.Infrastructure.ModelBinders
@@ -13,17 +14,15 @@ namespace KesselRunFramework.AspNet.Infrastructure.ModelBinders
     /// </summary>
     public class UtcAwareDateTimeModelBinder : IModelBinder
     {
-        private readonly DateTimeStyles _supportedStyles;
         private readonly ILogger _logger;
 
-        public UtcAwareDateTimeModelBinder(DateTimeStyles supportedStyles, ILoggerFactory loggerFactory)
+        public UtcAwareDateTimeModelBinder(ILoggerFactory loggerFactory)
         {
             if (loggerFactory == null)
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
 
-            _supportedStyles = supportedStyles;
             _logger = loggerFactory.CreateLogger<UtcAwareDateTimeModelBinder>();
         }
 
@@ -34,11 +33,18 @@ namespace KesselRunFramework.AspNet.Infrastructure.ModelBinders
                 throw new ArgumentNullException(nameof(bindingContext));
             }
 
+            _logger.AttemptToBindModel(bindingContext);
+
             var modelName = bindingContext.ModelName;
             var valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);
+
             if (valueProviderResult == ValueProviderResult.None)
             {
+                _logger.ValueNotFoundInRequest(bindingContext);
+
                 // no entry
+                _logger.AttemptToBindModelDone(bindingContext);
+
                 return Task.CompletedTask;
             }
 
@@ -48,42 +54,56 @@ namespace KesselRunFramework.AspNet.Infrastructure.ModelBinders
             var metadata = bindingContext.ModelMetadata;
             var type = metadata.UnderlyingOrModelType;
 
-            var value = valueProviderResult.FirstValue;
-            var culture = valueProviderResult.Culture;
+            try
+            {
+                var value = valueProviderResult.FirstValue;
 
-            object model;
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                model = null;
+                object model;
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    model = null;
+                }
+                else if (type == typeof(DateTime))
+                {
+                    if (value.EndsWith("Z"))
+                    {
+                        model = DateTime.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AllowWhiteSpaces);
+                    }
+                    else
+                    {
+                        model = DateTime.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal | DateTimeStyles.AllowWhiteSpaces);
+                    }
+                }
+                else
+                {
+                    // should be unreachable
+                    throw new NotSupportedException();
+                }
+
+                // When converting value, a null model may indicate a failed conversion for an otherwise required
+                // model (can't set a ValueType to null). This detects if a null model value is acceptable given the
+                // current bindingContext. If not, an error is logged.
+                if (model == null && !metadata.IsReferenceOrNullableType)
+                {
+                    modelState.TryAddModelError(
+                        modelName,
+                        metadata.ModelBindingMessageProvider.ValueMustNotBeNullAccessor(
+                            valueProviderResult.ToString()
+                            )
+                    );
+                }
+                else
+                {
+                    bindingContext.Result = ModelBindingResult.Success(model);
+                }
             }
-            else if (type == typeof(DateTime))
+            catch (Exception exception)
             {
-                // You could put custom logic here to sniff the raw value and call other DateTime.Parse overloads, e.g. forcing UTC
-                model = DateTime.Parse(value, culture, _supportedStyles);
-            }
-            else
-            {
-                // unreachable
-                throw new NotSupportedException();
+                // Conversion failed.
+                modelState.TryAddModelError(modelName, exception, metadata);
             }
 
-            // When converting value, a null model may indicate a failed conversion for an otherwise required
-            // model (can't set a ValueType to null). This detects if a null model value is acceptable given the
-            // current bindingContext. If not, an error is logged.
-            if (model == null && !metadata.IsReferenceOrNullableType)
-            {
-                modelState.TryAddModelError(
-                    modelName,
-                    metadata.ModelBindingMessageProvider.ValueMustNotBeNullAccessor(
-                        valueProviderResult.ToString())
-                );
-            }
-            else
-            {
-                _logger.TraceMessageModelBinderUsed(modelName, type.ToString(), nameof(UtcAwareDateTimeModelBinder));
-
-                bindingContext.Result = ModelBindingResult.Success(model);
-            }
+            _logger.AttemptToBindModelDone(bindingContext);
 
             return Task.CompletedTask;
         }

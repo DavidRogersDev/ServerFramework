@@ -19,7 +19,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
     [ApiVersion(Swagger.Versions.v1_0)]
     [Route(AspNet.Mvc.DefaultControllerTemplate)]
     [Produces(MediaTypeNames.Application.Json)]
-    public class RegisterUserController : KesselRunApiController
+    public class RegisterUserController : AppApiMediatrController
     {
         public RegisterUserController(
             ICurrentUser currentUser,
@@ -35,7 +35,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_0)]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<string>>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateUser([FromBody]RegisterUserPayloadDto dto)
+        public async Task<IActionResult> CreateUser([FromForm]RegisterUserPayloadDto dto)
         {
             var result = await _mediator.Send(new RegisterNewUserCommand
             {

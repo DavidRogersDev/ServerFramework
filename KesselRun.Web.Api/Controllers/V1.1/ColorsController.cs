@@ -19,7 +19,7 @@ namespace KesselRun.Web.Api.Controllers.V1._1
     [ApiVersion(Swagger.Versions.v1_1)]
     [Route(AspNet.Mvc.DefaultControllerTemplate)]
     [Produces(MediaTypeNames.Application.Json)]
-    public class ColorsController : KesselRunApiController
+    public class ColorsController : AppApiMediatrController
     {
         public ColorsController(
             ICurrentUser currentUser,

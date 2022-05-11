@@ -1,6 +1,6 @@
 ﻿namespace KesselRunFramework.AspNet.Infrastructure.Invariants
 {
-    public sealed class StartUp
+    public sealed class StartUpConfig
     {
         public const string Domain = "DomainAssembly";
         public const string Executing = "ExecutingAssembly";

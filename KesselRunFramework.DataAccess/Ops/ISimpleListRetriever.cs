@@ -1,11 +1,23 @@
 ﻿using System.Collections.Generic;
-using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 using KesselRunFramework.DataAccess.Domain;
+using Microsoft.Data.SqlClient;
 
 namespace KesselRunFramework.DataAccess.Ops
 {
     public interface ISimpleListRetriever
     {
-        IEnumerable<ISimpleListItem> GetSimpleList(DbParameter[] parameters, string query);
+        IEnumerable<ISimpleListItem> GetSimpleList(
+            string query,
+            SqlParameter[] parameters = null,
+            bool? withNullCheck = null
+            );
+        Task<IEnumerable<ISimpleListItem>> GetSimpleListAsync(
+            string query, 
+            CancellationToken cancellationToken, 
+            SqlParameter[] parameters = null,
+            bool? withNullCheck = null
+            );
     }
 }

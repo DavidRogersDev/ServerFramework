@@ -4,10 +4,13 @@ using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using FluentValidation.AspNetCore;
+using InControl.Framework.AspNet.Infrastructure.Bootstrapping.Config;
 using KesselRun.Business.DataTransferObjects;
 using KesselRun.Business.Validation;
+using KesselRun.Web.Api.Infrastructure.Bootstrapping;
 using KesselRun.Web.Api.Infrastructure.Mapping;
 using KesselRunFramework.AspNet.Infrastructure.ActionFilters;
+using KesselRunFramework.AspNet.Infrastructure.Bootstrapping;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc;
 using KesselRunFramework.AspNet.Infrastructure.HttpClient;
@@ -45,6 +48,7 @@ namespace KesselRun.Web.Api
         public IWebHostEnvironment WebHostEnvironment { get; }
         public IEnumerable<Type> ExportedTypesWebAssembly { get; set; }
         IDictionary<string, Assembly> Assemblies { get; set; }
+        public AppConfiguration AppConfiguration { get; set; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -55,15 +59,18 @@ namespace KesselRun.Web.Api
                     fv.RegisterValidatorsFromAssemblyContaining<ColorCollectionValidator>(lifetime: ServiceLifetime.Singleton)
                     );
 
-            var openApiInfos = GetOpenApiInfo("swaggerconfig.json");
-            Versions = openApiInfos.Select(i => i.Version); // stash this for use in the Configure method below.
-            services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, openApiInfos);
+            AppConfiguration = StartupConfigurer.GetAppConfiguration(Configuration);
+
+            Versions = AppConfiguration.GeneralConfig.OpenApiInfoList.Select(i => i.Version); // stash this for use in the Configure method below.
+            services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, AppConfiguration.GeneralConfig.OpenApiInfoList);
             services.ConfigureAppServices(WebHostEnvironment, Container);
             
-            ExportedTypesWebAssembly = Assemblies[StartUp.Executing].GetExportedTypes();
+            ExportedTypesWebAssembly = Assemblies[StartUpConfig.Executing].GetExportedTypes();
 
             var httpClientTypes = ExportedTypesWebAssembly
                     .Where(t => t.IsClass && typeof(ITypedHttpClient).IsAssignableFrom(t));
+
+            //services.AddRedirect(WebHostEnvironment, GeneralConfig.Hsts.MaxAge);
 
             services.RegisterTypedHttpClients(httpClientTypes);
         }
@@ -103,10 +110,10 @@ namespace KesselRun.Web.Api
         {
             Container.RegisterSingleton<ITypedClientResolver, TypedClientResolver>();
 
-            Container.RegisterValidationAbstractions(new[] { Assemblies[StartUp.Executing], Assemblies[StartUp.Domain] });
+            Container.RegisterValidationAbstractions(new[] { Assemblies[StartUpConfig.Executing], Assemblies[StartUpConfig.Domain] });
             Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(Assemblies));
-            Container.RegisterMediatRAbstractions(new[] { Assemblies[StartUp.Executing] }, GetTypesForPipeline(WebHostEnvironment));
-            Container.RegisterApplicationServices(Assemblies[StartUp.Domain], Configuration, "KesselRun.Business.ApplicationServices");
+            Container.RegisterMediatRAbstractions(new[] { Assemblies[StartUpConfig.Executing] }, GetTypesForPipeline(WebHostEnvironment));
+            Container.RegisterApplicationServices(Assemblies[StartUpConfig.Domain], Configuration, "KesselRun.Business.ApplicationServices");
         }
 
         private static Type[] GetTypesForPipeline(IWebHostEnvironment webHostEnvironment)
@@ -129,8 +136,8 @@ namespace KesselRun.Web.Api
         {
             var assemblies = new Dictionary<string, Assembly>(StringComparer.Ordinal)
             {
-                {StartUp.Executing, typeof(Startup).GetTypeInfo().Assembly},
-                {StartUp.Domain, typeof(RegisterUserPayloadDto).GetTypeInfo().Assembly }
+                {StartUpConfig.Executing, typeof(Startup).GetTypeInfo().Assembly},
+                {StartUpConfig.Domain, typeof(RegisterUserPayloadDto).GetTypeInfo().Assembly }
             };
 
             // include any custom (domain) assemblies which will require scanning as part of the startup process.
@@ -141,25 +148,9 @@ namespace KesselRun.Web.Api
         private static Profile[] GetAutoMapperProfiles(IDictionary<string, Assembly> configurationAssemblies)
         {
             var kesselRunApiProfile = new KesselRunApiProfile("KesselRunApiProfile");
-            kesselRunApiProfile.InitializeMappings(configurationAssemblies[StartUp.Domain].InArray());
+            kesselRunApiProfile.InitializeMappings(configurationAssemblies[StartUpConfig.Domain].InArray());
 
             return kesselRunApiProfile.InArray();
-        }
-
-        private static IList<OpenApiInfo> GetOpenApiInfo(string swaggerSettingsFile)
-        {
-            var swaggerConfiguration = new ConfigurationBuilder()
-                .SetBasePath(Program.BasePath)
-                .AddJsonFile(swaggerSettingsFile)
-                .Build();
-
-            var services = new ServiceCollection();
-            services.AddSingleton<List<OpenApiInfo>>(p => p.GetRequiredService<IOptions<List<OpenApiInfo>>>().Value);
-            services.Configure<List<OpenApiInfo>>(options => swaggerConfiguration.GetSection(nameof(OpenApiInfo)).Bind(options));
-
-            var serviceProvider = services.BuildServiceProvider();
-
-            return serviceProvider.GetService<List<OpenApiInfo>>();
         }
     }
 }

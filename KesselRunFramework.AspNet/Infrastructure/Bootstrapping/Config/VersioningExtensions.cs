@@ -24,7 +24,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 
             services.AddApiVersioning(options ?? (o =>
             {
-                o.DefaultApiVersion = new ApiVersion(StartUp.MajorVersion1, StartUp.MinorVersion0); // specify the default api version
+                o.DefaultApiVersion = new ApiVersion(StartUpConfig.MajorVersion1, StartUpConfig.MinorVersion0); // specify the default api version
                 o.AssumeDefaultVersionWhenUnspecified = true; // assume that the caller wants the default version if they don't specify
                 o.ReportApiVersions = true; // add headers in responses which show supported/deprecated versions
             }));
@@ -51,7 +51,16 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                         c.SwaggerDoc(name, openApiInfos[i]);
                     }
 
+                    // This line of code is to accommodate the fact that some of the classes have the same name (but are in different namespaces).
+                    // Swashbuckle uses the class name as the SchemaId by default. If 2 classes have the same name, it goes 💣!
+                    // This code includes the namespace, so there is no longer any conflict in SchemaIds.
+                    c.CustomSchemaIds(x => x.FullName);
+
+                    // This filter removed the "version" parameter from the parameters textboxes which are rendered.
+                    // It is redundant and not e genuine parameter if using Urls for versioning.
                     c.OperationFilter<RemoveVersionFromParameterFilter>();
+                    
+                    // This filter adds the version to the paths rendered on the page so you can see what Version you are dealing with at a glance.
                     c.DocumentFilter<ReplaceVersionWithExactValueInPath>();
 
                     //  This predicate is used by convention to obviate the need to decorate relevant actions with an 
@@ -71,8 +80,11 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                             .SelectMany(attr => attr.Versions)
                             .ToArray();
 
-                        return versions.Any(v => $"{Swagger.Versions.VersionPrefix}{v.ToString()}" == docName) 
-                               && (maps.Length == 0 || maps.Any(v => $"{Swagger.Versions.VersionPrefix}{v.ToString()}" == docName));
+                        return versions.Any(v => $"{Swagger.Versions.VersionPrefix}{v.ToString()}" == docName) &&
+                               (
+                                    maps.Length == 0 ||
+                                    maps.Any(v => $"{Swagger.Versions.VersionPrefix}{v.ToString()}" == docName)
+                               );
                     });
                     
                     c.AddSecurityDefinition(Invariants.Identity.Bearer, new OpenApiSecurityScheme
@@ -80,7 +92,8 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                         Description = Swagger.SecurityDefinition.Description,
                         In = ParameterLocation.Header,
                         Name = Swagger.SecurityDefinition.Name,
-                        Type = SecuritySchemeType.Http
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = Invariants.Identity.Bearer
                     });
 
                     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -122,6 +135,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                     {
                         for (int i = 0; i < versions.Length; i++)
                         {
+                            c.DefaultModelsExpandDepth(-1); // ◀ This prevents the rendering of the Models section at the bottom
                             c.SwaggerEndpoint(
                                 Swagger.EndPoint.Url.FormatAs(string.Concat(Swagger.Versions.VersionPrefix, versions[i])),
                                 Swagger.EndPoint.Name.FormatAs(string.Concat(Swagger.Versions.VersionPrefix, versions[i]))

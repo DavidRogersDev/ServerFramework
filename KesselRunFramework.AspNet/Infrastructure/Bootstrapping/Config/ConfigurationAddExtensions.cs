@@ -1,6 +1,8 @@
 ﻿using System;
 using KesselRunFramework.AspNet.Infrastructure.ActionFilters;
 using KesselRunFramework.AspNet.Infrastructure.Identity;
+using KesselRunFramework.AspNet.Infrastructure.Services;
+using KesselRunFramework.DataAccess;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -23,6 +25,9 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
+            services.AddScoped<ISessionStateService, SessionStateService>();
+            services.AddScoped<IRequestStateService, RequestStateService>();
+            services.AddScoped(s => container.GetInstance<IDbResolver>());
             services.AddScoped<ICurrentUser, CurrentUserAdapter>();
             services.AddScoped<ApiExceptionFilter>();
 

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace KesselRunFramework.AspNet.Response
 {
@@ -9,7 +8,6 @@ namespace KesselRunFramework.AspNet.Response
         {
             Message = string.Empty;
             ErrorId = string.Empty;
-            Errors = Enumerable.Empty<string>();
         }
 
         public OpResult OpResult { get; set; }
@@ -18,7 +16,7 @@ namespace KesselRunFramework.AspNet.Response
         public bool IsError { get; set; }
         public bool IsValidationFail { get; set; }
 
-        public IEnumerable<string> Errors { get; set; }
+        public dynamic Errors { get; set; }
 
         public static OperationOutcome SuccessfulOutcome => new OperationOutcome
         {
@@ -40,15 +38,14 @@ namespace KesselRunFramework.AspNet.Response
             OpResult = OpResult.Fail
         };
 
-        public static OperationOutcome ValidationFailOutcome(IEnumerable<string> errors, string message = null) => new OperationOutcome
+        public static OperationOutcome ValidationFailOutcome(dynamic errors, string message = null) => new OperationOutcome
         {
-            Errors = errors ?? Enumerable.Empty<string>(),
+            Errors = errors,
             ErrorId = string.Empty,
             IsError = false,
             IsValidationFail = true,
             Message = message ?? string.Empty,
             OpResult = OpResult.Fail
         };
-
     }
 }

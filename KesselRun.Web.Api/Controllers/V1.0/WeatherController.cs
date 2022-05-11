@@ -18,7 +18,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
     [ApiVersion(Swagger.Versions.v1_0)]
     [Route(AspNet.Mvc.DefaultControllerTemplate)]
     [Produces(MediaTypeNames.Application.Json)]
-    public class WeatherController : KesselRunApiController
+    public class WeatherController : AppApiMediatrController
     {
         private readonly RetryTestClient _retryTestClient;
 

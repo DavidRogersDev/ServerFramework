@@ -11,6 +11,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
         private static readonly Action<ILogger, long, Exception> ProfileMessagingTrace;
         private static readonly Action<ILogger, Exception> ValidMessageTrace;
 
+
         const string PipelineBehaviour = "Pipeline Behaviour: ";
 
         static LoggingExtensions()
@@ -70,5 +71,5 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
         {
             ValidMessageTrace(logger, null);
         }
-    }
+   }
 }

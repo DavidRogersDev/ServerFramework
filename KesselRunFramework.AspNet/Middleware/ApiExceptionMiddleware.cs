@@ -21,7 +21,9 @@ namespace KesselRunFramework.AspNet.Middleware
         private readonly ILogger<ApiExceptionMiddleware> _logger;
         private readonly ApiExceptionOptions _options;
 
-        public ApiExceptionMiddleware(ApiExceptionOptions options, RequestDelegate next,
+        public ApiExceptionMiddleware(
+            ApiExceptionOptions options, 
+            RequestDelegate next,
             ILogger<ApiExceptionMiddleware> logger)
         {
             _next = next;
@@ -48,7 +50,16 @@ namespace KesselRunFramework.AspNet.Middleware
             // This is what we tell the client.
             var outcome = OperationOutcome.UnSuccessfulOutcome;
             outcome.ErrorId = errorId;
+
+#if DEBUG
+            outcome.Message = string.Format(Errors.UnhandledErrorDebug, exception.GetBaseException().Message);
+            outcome.Errors = exception.StackTrace.Split(
+                Environment.NewLine, StringSplitOptions.RemoveEmptyEntries
+                ).Select(str => str.Trim()); // ease of readability, for debugging purposes 👍
+#else
             outcome.Message = string.Format(Errors.UnhandledError, errorId);
+#endif
+
 
             apiExceptionOptions.AddResponseDetails?.Invoke(context, exception, outcome);
 
@@ -67,7 +78,8 @@ namespace KesselRunFramework.AspNet.Middleware
 
             var apiResponse = new ApiResponse<IEnumerable<string>>
             {
-                Data = Enumerable.Empty<string>(), Outcome = outcome
+                Data = null, 
+                Outcome = outcome
             };
 
             var result = JsonSerializer.Serialize(apiResponse, Common.JsonSerializerOptions);

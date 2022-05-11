@@ -16,7 +16,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
     [ApiVersion(Swagger.Versions.v1_0)]
     [Route(AspNet.Mvc.DefaultControllerTemplate)]
     [Produces(MediaTypeNames.Application.Json)]
-    public class MediaContentController : KesselRunApiController
+    public class MediaContentController : AppApiMediatrController
     {
         public MediaContentController(ICurrentUser currentUser, ILogger logger, IMediator mediator) 
             : base(currentUser, logger, mediator)

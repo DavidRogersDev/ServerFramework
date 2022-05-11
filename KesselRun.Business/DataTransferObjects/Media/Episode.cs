@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace KesselRun.Business.DataTransferObjects.Media
 {
@@ -6,7 +6,7 @@ namespace KesselRun.Business.DataTransferObjects.Media
     {
         public string Title { get; set; }
         public string Released { get; set; }
-        [JsonProperty("Episode")]
+        [JsonPropertyName("episode")]
         public int EpisodeNr { get; set; }
         public string ImdbRating { get; set; }
         public string ImdbID { get; set; }

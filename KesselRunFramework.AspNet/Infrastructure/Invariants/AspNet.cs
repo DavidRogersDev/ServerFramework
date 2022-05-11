@@ -2,6 +2,15 @@
 {
     public sealed class AspNet
     {
+        public sealed class Request
+        {
+            public const string EndpointName = "EndpointName";
+            public const string FormParams = "FormParams";
+            public const string Protocol = "Protocol";
+            public const string QueryString = "QueryString";
+            public const string Scheme = "Scheme";
+        }
+
         public sealed class Mvc
         {
             public const string Action = "action";
@@ -9,11 +18,7 @@
             public const string Controller = "controller";
             public const string ControllerTemplate = "[controller]";
             public const string DefaultControllerTemplate = "v{version:apiVersion}/" + ControllerTemplate;
-            public const string TvShowAction = ActionTemplate + "/{title:string}";
-            public const string CategoryIdAction = ActionTemplate + "/{categoryId:int}";
-            public const string PriorityAction = ActionTemplate + "/{categoryId}/{groupId}";
-            public const string JobsForDateAction = ActionTemplate + "/{date}";
-            public const string JobsToDateAction = ActionTemplate + "/{startdate}/{todate}";
+            public const string IdAction = ActionTemplate + "/{id:int}";
         }
     }
 }

@@ -7,7 +7,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Invariants
     {
         public sealed class EndPoint
         {
-            public const string Name = "Abatements API {0}";
+            public const string Name = "App API {0}";
             public const string Url = "/swagger/{0}/swagger.json";
         }
 
@@ -15,8 +15,8 @@ namespace KesselRunFramework.AspNet.Infrastructure.Invariants
         {
             public const string ContactEmail = "your.email@youbusiness.com";
             public const string ContactName = "Your Name";
-            public const string Description = "A API to serve the Abatements application.";
-            public const string Title = "Abatements API";
+            public const string Description = "A API to serve the App application.";
+            public const string Title = "App API";
         }
         public sealed class SecurityDefinition
         {

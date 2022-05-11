@@ -16,7 +16,7 @@ namespace KesselRun.Web.Api.Controllers.V1_0
     [Route(AspNet.Mvc.DefaultControllerTemplate)]
     [Produces(MediaTypeNames.Application.Json)]
 
-    public class UserController : KesselRunApiController
+    public class UserController : AppApiMediatrController
     {
         public UserController(ICurrentUser currentUser, ILogger logger, IMediator mediator) 
             : base(currentUser, logger, mediator)

@@ -19,7 +19,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (validationAssemblies == null) throw new ArgumentNullException(nameof(validationAssemblies));
 
-            container.Collection.Register(typeof(IValidator<>), validationAssemblies);
+            container.Collection.Register(typeof(IValidator<>), validationAssemblies, Lifestyle.Singleton);
 
             container.Register(typeof(IValidator<>), typeof(CompositeValidator<>), Lifestyle.Singleton);
         }

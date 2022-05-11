@@ -12,7 +12,10 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config.SwaggerF
             foreach (var swaggerDocPath in swaggerDoc.Paths)
             {
                 //  swaggerDoc.Info.Version gets set by c.SwaggerDoc in AddSwaggerGen 
-                newPaths.Add(swaggerDocPath.Key.Replace("v{version}", swaggerDoc.Info.Version), swaggerDocPath.Value);
+                newPaths.Add(
+                    swaggerDocPath.Key.Replace("v{version}", string.Concat("V", swaggerDoc.Info.Version)),
+                    swaggerDocPath.Value
+                    );
             }
 
             swaggerDoc.Paths = newPaths;
