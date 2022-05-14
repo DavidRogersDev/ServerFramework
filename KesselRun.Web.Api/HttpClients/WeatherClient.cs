@@ -27,7 +27,7 @@ namespace KesselRun.Web.Api.HttpClients
             HttpClient.BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/weather");
             UriBuilder = new UriBuilder(HttpClient.BaseAddress);
             QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
-            QueryStringParams["appid"] = "395ba5d4531fb30d0e3487bd015e2a6c"; // your app id goes here.
+            QueryStringParams["appid"] = "[app id]"; // your app id goes here.
         }
 
         public async Task<WeatherDto> GetWeather(CancellationToken cancellationToken)

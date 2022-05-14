@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using KesselRun.Business.DataTransferObjects;
@@ -7,6 +6,7 @@ using KesselRun.Web.Api.Controllers.V1_0;
 using KesselRun.Web.Api.Messaging.Commands;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Controllers;
+using KesselRunFramework.AspNet.Infrastructure.Extensions;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
 using KesselRunFramework.AspNet.Response;
 using MediatR;
@@ -50,13 +50,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
                     id = result.Result.Data,
                     version = HttpContext.GetRequestedApiVersion().ToString()
                 }, result.Result)
-                : BadRequestResponse(Enumerable.Empty<string>(), operationOutcome: new OperationOutcome
-                {
-                    OpResult = OpResult.Fail,
-                    IsError = false,
-                    IsValidationFail = true,
-                    Errors = result.Errors
-                });
+                : result.ToUnprocessableRequestResult();
         }
     }
 }

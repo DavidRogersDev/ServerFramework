@@ -63,6 +63,7 @@ namespace KesselRun.Web.Api
 
             Versions = AppConfiguration.GeneralConfig.OpenApiInfoList.Select(i => i.Version); // stash this for use in the Configure method below.
             services.AddAppApiVersioning().AddSwagger(WebHostEnvironment, Configuration, AppConfiguration.GeneralConfig.OpenApiInfoList);
+            
             services.ConfigureAppServices(WebHostEnvironment, Container);
             
             ExportedTypesWebAssembly = Assemblies[StartUpConfig.Executing].GetExportedTypes();
@@ -73,6 +74,7 @@ namespace KesselRun.Web.Api
             //services.AddRedirect(WebHostEnvironment, GeneralConfig.Hsts.MaxAge);
 
             services.RegisterTypedHttpClients(httpClientTypes);
+
         }
 
 
@@ -99,6 +101,8 @@ namespace KesselRun.Web.Api
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

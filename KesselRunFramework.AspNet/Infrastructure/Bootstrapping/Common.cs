@@ -12,11 +12,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping
 
         public static ApiResponse<BadRequest400Payload> ProcessInvalidModelState(ModelStateDictionary modelState)
         {
-            var errors =
-                modelState.ToDictionary(
-                    k => k.Key, 
-                    v => v.Value.Errors.Select(e => e.ErrorMessage)
-                    );
+            var errors = GetErrorsFromModelState(modelState);
 
             var payload = new ApiResponse<BadRequest400Payload>
             {
@@ -29,8 +25,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping
 
         public static Dictionary<string, IEnumerable<string>> GetErrorsFromModelState(ModelStateDictionary modelState)
         {
-            var errors =
-                modelState
+            var errors = modelState
                     .Where(m => m.Value.Errors.Any())
                     .ToDictionary(
                         k => k.Key,

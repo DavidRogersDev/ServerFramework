@@ -48,7 +48,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Controllers
             return Ok(apiResponse);
         }
 
-        public IActionResult BadRequestResponse<T>(T data, string errorMessage = null, IEnumerable<string> errors = null)
+        public IActionResult BadRequestResponse<T>(T data, string errorMessage = null, dynamic errors = null)
         {
             var outcome = OperationOutcome.ValidationFailOutcome(errors, errorMessage);
 
@@ -107,7 +107,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Controllers
             return Created(url, apiResponse);
         }
 
-        public IActionResult UnprocessableEntityResponse<T>(T data, string errorMessage = null, IEnumerable<string> errors = null)
+        public IActionResult UnprocessableEntityResponse<T>(T data, string errorMessage = null, dynamic errors = null)
         {
             var outcome = OperationOutcome.ValidationFailOutcome(errors, errorMessage);
 
@@ -136,7 +136,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Controllers
             return StatusCode(StatusCodes.Status422UnprocessableEntity, apiResponse);
         }
 
-        public IActionResult InternalServerErrorResponse<T>(T data, string errorMessage = null, IEnumerable<string> errors = null)
+        public IActionResult InternalServerErrorResponse<T>(T data, string errorMessage = null, dynamic errors = null)
         {
             var outcome = OperationOutcome.ValidationFailOutcome(errors, errorMessage);
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mime;
@@ -76,7 +75,7 @@ namespace KesselRunFramework.AspNet.Middleware
                 errorId
                 );
 
-            var apiResponse = new ApiResponse<IEnumerable<string>>
+            var apiResponse = new ApiResponse<object>
             {
                 Data = null, 
                 Outcome = outcome

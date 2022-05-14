@@ -11,7 +11,11 @@ namespace KesselRunFramework.AspNet.Infrastructure.Services
 
         public SessionStateService(IHttpContextAccessor contextAccessor)
         {
+#if DEBUG
+            _sessionState = contextAccessor?.HttpContext?.Session; // is null when container.Verify() is called. Only called in Development.
+#else
             _sessionState = contextAccessor.HttpContext.Session;
+#endif
         }
 
         public bool? GetBoolean(string key)
@@ -36,14 +40,11 @@ namespace KesselRunFramework.AspNet.Infrastructure.Services
 
         public DateTimeOffset? GetDateTimeOffset(string key)
         {
-            var data = _sessionState.Get(key);
+            var data = _sessionState.GetString(key);
 
             if (ReferenceEquals(data, null)) return null;
 
-            long ticks = BitConverter.ToInt64(data, 0);
-
-            return new DateTime(ticks);
-
+            return JsonSerializer.Deserialize<DateTimeOffset>(data);
         }
 
         public T GetObject<T>(string key)
@@ -78,19 +79,10 @@ namespace KesselRunFramework.AspNet.Infrastructure.Services
             _sessionState.Set(key, data);
         }
 
-        //public void SetDateTimeOffset(string key, DateTimeOffset value)
-        //{
-        //    long ticks = value.Ticks;
-        //    var data = BitConverter.GetBytes(ticks);
-
-        //    var ticksPlusOffset = new TicksPlusOffset
-        //    {
-        //        Offset = value.Offset,
-        //        Ticks = data
-        //    };
-
-        //    _sessionState.Set(key, JsonConvert.SerializeObject(ticksPlusOffset));
-        //}
+        public void SetDateTimeOffset(string key, DateTimeOffset value)
+        {
+            _sessionState.SetString(key, JsonSerializer.Serialize(value));
+        }
 
         public void SetObject<T>(string key, T item)
         {

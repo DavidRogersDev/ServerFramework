@@ -23,7 +23,7 @@ namespace KesselRun.Web.Api.HttpClients
             HttpClient.BaseAddress = new Uri("https://www.omdbapi.com");
             UriBuilder = new UriBuilder(HttpClient.BaseAddress);
             QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
-            QueryStringParams["apikey"] = "af2a3ba8";
+            QueryStringParams["apikey"] = "[api key]"; // your api key goes here.
         }
 
 

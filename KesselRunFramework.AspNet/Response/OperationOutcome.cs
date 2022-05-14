@@ -13,8 +13,7 @@ namespace KesselRunFramework.AspNet.Response
         public OpResult OpResult { get; set; }
         public string ErrorId { get; set; }
         public string Message { get; set; }
-        public bool IsError { get; set; }
-        public bool IsValidationFail { get; set; }
+        public FailType FailType { get; set; }
 
         public dynamic Errors { get; set; }
 
@@ -22,8 +21,7 @@ namespace KesselRunFramework.AspNet.Response
         {
             Errors = Enumerable.Empty<string>(),
             ErrorId = string.Empty,
-            IsError = false,
-            IsValidationFail = false,
+            FailType = FailType.None,
             Message = string.Empty,
             OpResult = OpResult.Success
         };
@@ -32,8 +30,7 @@ namespace KesselRunFramework.AspNet.Response
         {
             Errors = Enumerable.Empty<string>(),
             ErrorId = string.Empty,
-            IsError = true,
-            IsValidationFail = false,
+            FailType = FailType.Error,
             Message = string.Empty,
             OpResult = OpResult.Fail
         };
@@ -42,8 +39,7 @@ namespace KesselRunFramework.AspNet.Response
         {
             Errors = errors,
             ErrorId = string.Empty,
-            IsError = false,
-            IsValidationFail = true,
+            FailType = FailType.ValidationFailure,
             Message = message ?? string.Empty,
             OpResult = OpResult.Fail
         };

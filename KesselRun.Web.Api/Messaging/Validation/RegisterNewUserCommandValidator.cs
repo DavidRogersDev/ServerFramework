@@ -6,10 +6,10 @@ using Constants = KesselRun.Business.Invariants;
 
 namespace KesselRun.Web.Api.Messaging.Validation
 {
-    public class RegisterNewUserValidator : AbstractValidator<RegisterNewUserCommand>
+    public class RegisterNewUserCommandValidator : AbstractValidator<RegisterNewUserCommand>
     {
 
-        public RegisterNewUserValidator()
+        public RegisterNewUserCommandValidator()
         {
             RuleFor(u => u.Dto.UserName)
                 .MustAsync(NotContainUserAlready)
@@ -18,8 +18,12 @@ namespace KesselRun.Web.Api.Messaging.Validation
 
         async Task<bool> NotContainUserAlready(RegisterNewUserCommand dto, string userName, CancellationToken cancellation = new CancellationToken())
         {
+            // **************************************************************************************************** /
+            //
             // Normally we would hit a database and retrieve the User here.
             // For demo purposes, I will enforce an assumption that a user with UserName "DaveRogers" already exists.
+            //
+            // **************************************************************************************************** /
 
             return await Task.FromResult(!userName.Equals("DaveRogers"));
         }

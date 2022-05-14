@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KesselRunFramework.AspNet",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KesselRun.Business", "KesselRun.Business\KesselRun.Business.csproj", "{94CB80BB-930E-45E0-AE24-842E9C0635D9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{91A3F9AD-E9B4-40BD-B916-C32EE6C9C3E4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 Business", "02 Business", "{91A3F9AD-E9B4-40BD-B916-C32EE6C9C3E4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{C303B5E6-8C2A-4ACE-9688-BD2441F6A650}"
 EndProject

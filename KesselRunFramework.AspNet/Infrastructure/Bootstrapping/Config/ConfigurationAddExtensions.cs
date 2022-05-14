@@ -6,6 +6,7 @@ using KesselRunFramework.DataAccess;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SimpleInjector;
@@ -22,6 +23,8 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
 
             // For ASP.NET centric stuff, regester it with the framework container i.e. IServiceCollection
             services.AddHttpContextAccessor();
+            services.AddDistributedMemoryCache();
+            services.AddSession();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             

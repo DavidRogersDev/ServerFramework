@@ -6,23 +6,23 @@ namespace KesselRunFramework.Core.Infrastructure.Messaging
 {
     public class ValidateableResponse
     {
-        private readonly IList<string> _errorMessages;
+        private readonly IDictionary<string, IEnumerable<string>> _errors;
 
-        public ValidateableResponse(IList<string> errors = null)
+        public ValidateableResponse(IDictionary<string, IEnumerable<string>> validationErrors = null)
         {
-            _errorMessages = errors ?? new List<string>();
+            _errors = validationErrors ?? new Dictionary<string, IEnumerable<string>>();
         }
 
-        public bool IsValidResponse => _errorMessages.None();
+        public bool IsValidResponse => _errors.None();
 
-        public IReadOnlyCollection<string> Errors => new ReadOnlyCollection<string>(_errorMessages);
+        public IReadOnlyDictionary<string, IEnumerable<string>> Errors => new ReadOnlyDictionary<string, IEnumerable<string>>(_errors);
     }
 
     public class ValidateableResponse<TModel> : ValidateableResponse
         where TModel : class
     {
 
-        public ValidateableResponse(TModel model, IList<string> validationErrors = null)
+        public ValidateableResponse(TModel model, IDictionary<string, IEnumerable<string>> validationErrors = null)
             : base(validationErrors)
         {
             Result = model;

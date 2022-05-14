@@ -9,7 +9,11 @@ namespace KesselRunFramework.AspNet.Infrastructure.Services
 
         public RequestStateService(IHttpContextAccessor contextAccessor)
         {
+#if DEBUG
             _requestItems = contextAccessor?.HttpContext?.Items;
+#else
+            _requestItems = contextAccessor.HttpContext.Items;
+#endif
         }
 
         public T GetItem<T>(string key)
@@ -23,6 +27,11 @@ namespace KesselRunFramework.AspNet.Infrastructure.Services
         public bool HasItem(string key)
         {
             return _requestItems.ContainsKey(key);
+        }
+
+        public bool RemoveItem(string key)
+        {
+            return _requestItems.Remove(key);
         }
 
         public void SetItem<T>(string key, T item)

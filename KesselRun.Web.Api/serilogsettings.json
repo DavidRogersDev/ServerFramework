@@ -21,7 +21,7 @@
           "retainedFileCountLimit": 30,
           "rollingInterval": "Day",
           "rollOnFileSizeLimit": true,
-          "restrictedToMinimumLevel": "Information"
+          "restrictedToMinimumLevel": "Debug"
         }
       }
     ],
