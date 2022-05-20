@@ -1,11 +1,10 @@
 ﻿using KesselRun.Business.DataTransferObjects;
 using KesselRunFramework.AspNet.Response;
 using KesselRunFramework.Core.Infrastructure.Messaging;
-using MediatR;
 
-namespace KesselRun.Web.Api.Messaging.Commands
+namespace KesselRun.Web.Api.New
 {
-    public class RegisterNewUserCommand : IRequest<ValidateableResponse<ApiResponse<int>>>, IValidateable, IMembershipCommand
+    public class RegisterNewUserCommand : ICommand<ValidateableResponse<ApiResponse<int>>>
     {
         public RegisterUserPayloadDto Dto { get; set; }
     }

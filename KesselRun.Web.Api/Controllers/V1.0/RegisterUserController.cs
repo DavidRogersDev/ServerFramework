@@ -1,14 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using KesselRun.Business.DataTransferObjects;
 using KesselRun.Web.Api.Controllers.V1_0;
 using KesselRun.Web.Api.Messaging.Commands;
+using KesselRun.Web.Api.New;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Controllers;
 using KesselRunFramework.AspNet.Infrastructure.Extensions;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
 using KesselRunFramework.AspNet.Response;
+using KesselRunFramework.Core.Infrastructure.Messaging;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +24,16 @@ namespace KesselRun.Web.Api.Controllers.V1._0
     [Produces(MediaTypeNames.Application.Json)]
     public class RegisterUserController : AppApiMediatrController
     {
+        private readonly ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>> handler;
+
         public RegisterUserController(
             ICurrentUser currentUser,
             ILogger logger,
+            ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>> handler,
             IMediator mediator)
             : base(currentUser, logger, mediator)
         {
+            this.handler = handler;
         }
 
         [HttpPost]
@@ -37,10 +44,10 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<string>>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateUser([FromForm]RegisterUserPayloadDto dto)
         {
-            var result = await _mediator.Send(new RegisterNewUserCommand
+            var result = await handler.ExecuteAsync(new RegisterNewUserCommand
             {
                 Dto = dto
-            });
+            }, CancellationToken.None);
 
             return result.IsValidResponse
                 ? CreatedAtRoute(routeValues: new

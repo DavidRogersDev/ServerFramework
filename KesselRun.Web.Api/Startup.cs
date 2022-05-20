@@ -9,6 +9,7 @@ using KesselRun.Business.DataTransferObjects;
 using KesselRun.Business.Validation;
 using KesselRun.Web.Api.Infrastructure.Bootstrapping;
 using KesselRun.Web.Api.Infrastructure.Mapping;
+using KesselRun.Web.Api.New;
 using KesselRunFramework.AspNet.Infrastructure.ActionFilters;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config;
@@ -83,6 +84,15 @@ namespace KesselRun.Web.Api
             app.UseSimpleInjectorForDomain(Container);
 
             RegisterApplicationServices();
+
+            // commands and command decorators
+            Container.Register(typeof(ICommandHandler<,>), Assemblies[StartUpConfig.Executing]);
+            Container.RegisterDecorator(typeof(ICommandHandler<,>), typeof(LogContextDecorator<,>));
+            Container.RegisterDecorator(typeof(ICommandHandler<,>), typeof(BusinessValidationDecorator<,>));
+
+            // queries and quert decorators
+            Container.Register(typeof(IQueryHandler<,>), Assemblies[StartUpConfig.Executing]);
+
 
             app.ConfigureMiddlewareForEnvironments(env, Container);
 

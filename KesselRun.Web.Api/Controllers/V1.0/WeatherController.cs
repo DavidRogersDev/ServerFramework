@@ -49,7 +49,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RetryTest()
         {
-            var weather = _retryTestClient.GetTestPayload();
+            var weather = await _retryTestClient.GetTestPayload();
 
             return OkResponse(weather);
         }

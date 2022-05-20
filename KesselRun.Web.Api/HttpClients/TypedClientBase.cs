@@ -26,7 +26,7 @@ namespace KesselRun.Web.Api.HttpClients
             httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(DecompressionMethods.GZip.ToString().ToLower()));
         }
 
-        protected async ValueTask<TValue?> DeserializeAsync<TValue>(Stream stream)
+        protected async ValueTask<TValue> DeserializeAsync<TValue>(Stream stream)
         {
             return await JsonSerializer.DeserializeAsync<TValue>(stream, Common.JsonSerializerOptions);
         }

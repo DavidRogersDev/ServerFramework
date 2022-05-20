@@ -1,28 +1,25 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using KesselRunFramework.Core.Infrastructure.Extensions;
+﻿using KesselRunFramework.Core.Infrastructure.Extensions;
+using System.Collections.Generic;
 
 namespace KesselRunFramework.Core.Infrastructure.Messaging
 {
     public class ValidateableResponse
     {
-        private readonly IDictionary<string, IEnumerable<string>> _errors;
-
-        public ValidateableResponse(IDictionary<string, IEnumerable<string>> validationErrors = null)
+        public ValidateableResponse(IReadOnlyDictionary<string, IEnumerable<string>> validationErrors = null)
         {
-            _errors = validationErrors ?? new Dictionary<string, IEnumerable<string>>();
+            Errors = validationErrors ?? new Dictionary<string, IEnumerable<string>>();
         }
 
-        public bool IsValidResponse => _errors.None();
+        public bool IsValidResponse => Errors.None();
 
-        public IReadOnlyDictionary<string, IEnumerable<string>> Errors => new ReadOnlyDictionary<string, IEnumerable<string>>(_errors);
+        public IReadOnlyDictionary<string, IEnumerable<string>> Errors { get; }
     }
 
     public class ValidateableResponse<TModel> : ValidateableResponse
         where TModel : class
     {
 
-        public ValidateableResponse(TModel model, IDictionary<string, IEnumerable<string>> validationErrors = null)
+        public ValidateableResponse(TModel model, IReadOnlyDictionary<string, IEnumerable<string>> validationErrors = null)
             : base(validationErrors)
         {
             Result = model;
