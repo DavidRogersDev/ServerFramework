@@ -8,6 +8,7 @@ using KesselRunFramework.AspNet.Infrastructure.Bootstrapping;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
 using KesselRunFramework.AspNet.Response;
 using KesselRunFramework.Core.Infrastructure.Errors;
+using KesselRunFramework.Core.Infrastructure.Extensions;
 using KesselRunFramework.Core.Infrastructure.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,7 @@ namespace KesselRunFramework.AspNet.Middleware
         private readonly ApiExceptionOptions _options;
 
         public ApiExceptionMiddleware(
-            ApiExceptionOptions options, 
+            ApiExceptionOptions options,
             RequestDelegate next,
             ILogger<ApiExceptionMiddleware> logger)
         {
@@ -51,12 +52,12 @@ namespace KesselRunFramework.AspNet.Middleware
             outcome.ErrorId = errorId;
 
 #if DEBUG
-            outcome.Message = string.Format(Errors.UnhandledErrorDebug, exception.GetBaseException().Message);
+            outcome.Message = Errors.UnhandledErrorDebug.FormatAs(exception.GetBaseException().Message);
             outcome.Errors = exception.StackTrace.Split(
                 Environment.NewLine, StringSplitOptions.RemoveEmptyEntries
                 ).Select(str => str.Trim()); // ease of readability, for debugging purposes 👍
 #else
-            outcome.Message = string.Format(Errors.UnhandledError, errorId);
+            outcome.Message = Errors.UnhandledError.FormatAs(errorId);
 #endif
 
 
@@ -66,24 +67,24 @@ namespace KesselRunFramework.AspNet.Middleware
             var resolvedExceptionMessage = GetInnermostExceptionMessage(exception);
 
             var level = _options.DetermineLogLevel?.Invoke(exception) ?? LogLevel.Error;
-            
+
             _logger.Log(level,
                 EventIDs.EventIdUncaughtGlobal,
-                exception, 
-                 MessageTemplates.UncaughtGlobal, 
-                resolvedExceptionMessage, 
+                exception,
+                 MessageTemplates.UncaughtGlobal,
+                resolvedExceptionMessage,
                 errorId
                 );
 
             var apiResponse = new ApiResponse<object>
             {
-                Data = null, 
+                Data = null,
                 Outcome = outcome
             };
 
             var result = JsonSerializer.Serialize(apiResponse, Common.JsonSerializerOptions);
             context.Response.ContentType = MediaTypeNames.Application.Json;
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
             await context.Response.WriteAsync(result);
         }
@@ -92,7 +93,7 @@ namespace KesselRunFramework.AspNet.Middleware
         {
             if (ReferenceEquals(exception.InnerException, null))
                 return exception.Message;
-            
+
             return GetInnermostExceptionMessage(exception.InnerException);
         }
     }

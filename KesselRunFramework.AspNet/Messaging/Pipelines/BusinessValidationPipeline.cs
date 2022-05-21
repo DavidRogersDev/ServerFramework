@@ -25,8 +25,8 @@ namespace KesselRunFramework.AspNet.Messaging.Pipelines
         private readonly IActionContextAccessor _actionContextAccessor;
 
         public BusinessValidationPipeline(
-            IValidator<TRequest> compositeValidator, 
-            ILogger<TRequest> logger, 
+            IValidator<TRequest> compositeValidator,
+            ILogger<TRequest> logger,
             ICurrentUser currentUser,
             IActionContextAccessor actionContextAccessor)
         {
@@ -39,46 +39,54 @@ namespace KesselRunFramework.AspNet.Messaging.Pipelines
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             _logger.TraceBeforeValidatingMessage();
-            
-            var result = await _compositeValidator.ValidateAsync(request, cancellationToken);
 
-            if (!result.IsValid)
+            var responseType = typeof(TResponse);
+
+            if (responseType.Name.StartsWith(nameof(ValidateableResponse), StringComparison.Ordinal))
             {
-                _logger.TraceMessageValidationFailed(
-                    result.Errors.Select(s => s.ErrorMessage).Aggregate(
-                            (acc, current) => acc += string.Concat(GeneralPurpose.UniqueDelimiter, current)
-                        ),
-                    _currentUser?.UserName ?? GeneralPurpose. AnonymousUser
-                    );
+                var result = await _compositeValidator.ValidateAsync(request, cancellationToken);
 
-                var responseType = typeof(TResponse);
-
-                if (responseType.IsGenericType)
+                if (!result.IsValid)
                 {
-                    // Add validation fail to ModelState to make it available there. Just in case it is needed.
-                    result.AddToModelState(_actionContextAccessor.ActionContext.ModelState, string.Empty);                    
+                    var errorsCollated = result.ToDictionary();
 
-                    var resultType = responseType.GetGenericArguments()[0];
+                    _logger.TraceMessageValidationFailed(errorsCollated, _currentUser?.UserName ?? GeneralPurpose.AnonymousUser);
+
+                    // Add validation fail to ModelState to make it available there. Just in case it is needed.
+                    result.AddToModelState(_actionContextAccessor.ActionContext.ModelState, string.Empty);
+
+                    // Deal with type depending on whether it is the generic version of ValidateableResponse or not.
+                    var resultType = responseType.GetGenericArguments().FirstOrDefault();
+
+                    if (ReferenceEquals(resultType, null))
+                    {
+                        var nonGenericInvalidResponse =
+                            Activator.CreateInstance(
+                                responseType,
+                                errorsCollated
+                                ) as TResponse;
+
+                        return nonGenericInvalidResponse;
+                    }
+
                     var invalidResponseType = typeof(ValidateableResponse<>).MakeGenericType(resultType);
 
                     var invalidResponse =
                         Activator.CreateInstance(
-                            invalidResponseType, 
-                            null, 
-                            result.ToDictionary()
+                            invalidResponseType,
+                            null,
+                            errorsCollated
                             ) as TResponse;
 
                     return invalidResponse;
                 }
-                
-                throw new Exception("IValidateable implementation must be a generic type.");
+
+                _logger.TraceMessageValidationPassed();
+
+                return await next();
             }
 
-            _logger.TraceMessageValidationPassed();
-
-            var response = await next();
-
-            return response;
+            throw new Exception($"IValidateable implementation must be a {nameof(ValidateableResponse)}.");
         }
     }
 }

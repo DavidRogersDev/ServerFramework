@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
 namespace KesselRunFramework.AspNet.Infrastructure.Logging
@@ -6,7 +7,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
     public static class LoggingExtensions
     {
         private static readonly Action<ILogger, Exception> BeforeValidatingMessageTrace;
-        private static readonly Action<ILogger, string, string, Exception> InvalidMessageTrace;
+        private static readonly Action<ILogger, IDictionary<string, IEnumerable<string>>, string, Exception> InvalidMessageTrace;
         private static readonly Action<ILogger, string, string, string, Exception> ModelBinderUsed;
         private static readonly Action<ILogger, long, Exception> ProfileMessagingTrace;
         private static readonly Action<ILogger, Exception> ValidMessageTrace;
@@ -28,10 +29,10 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
                 PipelineBehaviour + " Request took {milliseconds} milliseconds."
                 );
 
-            InvalidMessageTrace = LoggerMessage.Define<string, string>(
+            InvalidMessageTrace = LoggerMessage.Define<IDictionary<string, IEnumerable<string>>, string>(
                 LogLevel.Debug,
                 new EventId((int)TraceEventIdentifiers.InValidMessageTrace, nameof(TraceMessageValidationFailed)),
-                PipelineBehaviour + " Invalid Message. {message}. User: {user}."
+                PipelineBehaviour + " Invalid Message. {errors}. User: {user}"
                 );
 
             ModelBinderUsed = LoggerMessage.Define<string, string, string>(
@@ -52,9 +53,9 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
             ProfileMessagingTrace(logger, milliseconds, null);
         }
 
-        public static void TraceMessageValidationFailed(this ILogger logger, string message, string user)
+        public static void TraceMessageValidationFailed(this ILogger logger, IDictionary<string, IEnumerable<string>> errors, string user)
         {
-            InvalidMessageTrace(logger, message, user, null);
+            InvalidMessageTrace(logger, errors, user, null);
         }
 
         public static void TraceBeforeValidatingMessage(this ILogger logger)
@@ -71,5 +72,5 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
         {
             ValidMessageTrace(logger, null);
         }
-   }
+    }
 }
