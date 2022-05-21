@@ -57,7 +57,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                     c.CustomSchemaIds(x => x.FullName);
 
                     // This filter removed the "version" parameter from the parameters textboxes which are rendered.
-                    // It is redundant and not e genuine parameter if using Urls for versioning.
+                    // It is redundant and not a genuine parameter if using Urls for versioning.
                     c.OperationFilter<RemoveVersionFromParameterFilter>();
                     
                     // This filter adds the version to the paths rendered on the page so you can see what Version you are dealing with at a glance.

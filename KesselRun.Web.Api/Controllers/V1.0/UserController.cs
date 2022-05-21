@@ -4,7 +4,6 @@ using KesselRun.Web.Api.Messaging.Queries;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Controllers;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
-using KesselRunFramework.AspNet.Infrastructure.Services;
 using KesselRunFramework.AspNet.Response;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +26,6 @@ namespace KesselRun.Web.Api.Controllers.V1_0
         [HttpGet]
         [Route(AspNet.Mvc.IdAction)]
         [MapToApiVersion(Swagger.Versions.v1_0)]
-        [ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_0)]
         [ProducesResponseType(typeof(ApiResponse<string>), 200)]
         public async Task<IActionResult> GetUser(int id)
         {

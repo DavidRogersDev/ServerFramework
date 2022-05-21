@@ -7,8 +7,6 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -33,7 +31,6 @@ namespace KesselRun.Web.Api.Controllers.V1._1
         [HttpGet]
         [Route(AspNet.Mvc.ActionTemplate)]
         [MapToApiVersion(Swagger.Versions.v1_1)]
-        //[ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_1)]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetColors()

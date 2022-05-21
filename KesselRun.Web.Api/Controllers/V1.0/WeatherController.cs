@@ -31,7 +31,6 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [HttpGet]
         [Route(AspNet.Mvc.ActionTemplate)]
         [MapToApiVersion(Swagger.Versions.v1_0)]
-        [ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_0)]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetWeather([FromQuery]WeatherPayloadDto weatherPayloadDto)
@@ -44,7 +43,6 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [HttpGet]
         [Route(AspNet.Mvc.ActionTemplate)]
         [MapToApiVersion(Swagger.Versions.v1_0)]
-        [ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_0)]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RetryTest()
@@ -57,7 +55,6 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [HttpPost]
         [Route(AspNet.Mvc.ActionTemplate)]
         [MapToApiVersion(Swagger.Versions.v1_0)]
-        [ApiExplorerSettings(GroupName = Swagger.DocVersions.v1_0)]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> TestInvalidModel(int id, string name)
@@ -69,7 +66,5 @@ namespace KesselRun.Web.Api.Controllers.V1._0
 
             return OkResponse(send);
         }
-
-
     }
 }
