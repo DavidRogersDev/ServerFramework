@@ -10,10 +10,11 @@ using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using KesselRun.Business.DataTransferObjects;
-using KesselRun.Web.Api.New;
 using KesselRunFramework.Core.Infrastructure.Validation;
 using FluentValidation.Results;
 using System.Threading;
+using KesselRunFramework.Core.Cqrs.Queries;
+using KesselRun.Web.Api.Messaging.Queries;
 
 namespace KesselRun.Web.Api.Controllers.V1._1
 {

@@ -1,11 +1,14 @@
 ﻿using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
+using KesselRun.Business.DataTransferObjects;
 using KesselRun.Web.Api.Messaging.Queries;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Controllers;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
 using KesselRunFramework.AspNet.Response;
-using MediatR;
+using KesselRunFramework.Core.Cqrs.Queries;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -16,20 +19,24 @@ namespace KesselRun.Web.Api.Controllers.V1_0
     [Route(AspNet.Mvc.DefaultControllerTemplate)]
     [Produces(MediaTypeNames.Application.Json)]
 
-    public class UserController : AppApiMediatrController
+    public class UserController : AppApiController
     {
-        public UserController(ICurrentUser currentUser, ILogger logger, IMediator mediator) 
-            : base(currentUser, logger, mediator)
+        private readonly IQueryHandler<GetUserQuery, UserPayloadDto> _queryHandler;
+
+        public UserController(ICurrentUser currentUser, ILogger logger, IQueryHandler<GetUserQuery, UserPayloadDto> queryHandler) 
+            : base(currentUser)
         {
+            _queryHandler = queryHandler;
         }
 
         [HttpGet]
         [Route(AspNet.Mvc.IdAction)]
         [MapToApiVersion(Swagger.Versions.v1_0)]
-        [ProducesResponseType(typeof(ApiResponse<string>), 200)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetUser(int id)
         {
-            var user = await _mediator.Send(new GetUserQuery {UserId = id});
+            var user = await _queryHandler.HandleAsync(new GetUserQuery {UserId = id}, CancellationToken.None);
 
             return OkResponse(user);
         }

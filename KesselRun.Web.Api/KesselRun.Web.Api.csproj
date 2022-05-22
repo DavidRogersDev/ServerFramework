@@ -23,5 +23,9 @@
     <ProjectReference Include="..\KesselRunFramework.DataAccess\KesselRunFramework.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="New\" />
+  </ItemGroup>
+
 
 </Project>

@@ -1,10 +1,11 @@
 ﻿using FluentValidation.Results;
 using KesselRun.Business.DataTransferObjects;
-using KesselRun.Web.Api.New;
+using KesselRun.Web.Api.Messaging.Queries;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Controllers;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
 using KesselRunFramework.AspNet.Response;
+using KesselRunFramework.Core.Cqrs.Queries;
 using KesselRunFramework.Core.Infrastructure.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

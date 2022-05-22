@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using KesselRunFramework.AspNet.Infrastructure.HttpClient;
 using KesselRunFramework.Core.Infrastructure.Errors;
+using KesselRunFramework.Core.Infrastructure.Http;
 using KesselRunFramework.Core.Infrastructure.Logging;
 using KesselRunFramework.Core.Infrastructure.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -22,21 +23,13 @@ namespace KesselRun.Web.Api.HttpClients
         {
             _logger = logger;
             HttpClient.BaseAddress = new Uri("https://localhost:44356/WeatherForecast");
-            //UriBuilder = new UriBuilder(HttpClient.BaseAddress);
-            //UriBuilder = new UriBuilder(HttpClient.BaseAddress);
-            //QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
-
         }
 
         public async Task<Either<string, ProblemDetails>> GetPayload(int id, string name, CancellationToken cancellationToken)
         {
             string weather = "";
             string errors = "";
-            ProblemDetails problemDetails = null;
-            //QueryStringParams["Id"] = id.ToString();
-            //QueryStringParams["Name"] = name;
-
-            //UriBuilder.Query = QueryStringParams.ToString();
+            HttpStatusCode statusCode = default(HttpStatusCode);
 
             var form = new FormUrlEncodedContent(new []
             { 
@@ -48,6 +41,8 @@ namespace KesselRun.Web.Api.HttpClients
             {
                 using (var response = await HttpClient.PostAsync(HttpClient.BaseAddress, form, cancellationToken))
                 {
+                    statusCode = response.StatusCode;
+
                     if (!response.IsSuccessStatusCode)
                     {
                         if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -69,6 +64,29 @@ namespace KesselRun.Web.Api.HttpClients
                     MessageTemplates.HttpClientGet,
                     UriBuilder.Uri.AbsolutePath
                 );
+
+                if (statusCode == HttpStatusCode.InternalServerError)
+                {
+                    var problemDetails = new ProblemDetails();
+                    problemDetails.Extensions.Add("HttpClientException", "An error was thrown from an API being called.");
+                    problemDetails.Title = ProblemDetailTitles.InternalServerError;
+                    problemDetails.Type = ProblemDetailTypes.InternalServerError;
+                    problemDetails.Status = (int)HttpStatusCode.InternalServerError;
+
+                    return problemDetails;
+                }
+
+                if (statusCode == HttpStatusCode.Unauthorized)
+                {
+                    var problemDetails = new ProblemDetails();
+                    problemDetails.Extensions.Add("UnauthorisedException", "A 401 Unauthorized response was received from an API being called.");
+                    problemDetails.Title = ProblemDetailTitles.AuthorizationError;
+                    problemDetails.Type = ProblemDetailTypes.Unauthorized;
+                    problemDetails.Status = (int)HttpStatusCode.Unauthorized;
+
+                    return problemDetails;
+                }
+
             }
 
             return weather;

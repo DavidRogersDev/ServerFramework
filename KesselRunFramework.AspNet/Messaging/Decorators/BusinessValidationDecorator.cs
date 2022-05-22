@@ -1,42 +1,47 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.AspNetCore;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Logging;
+using KesselRunFramework.Core.Cqrs.Commands;
 using KesselRunFramework.Core.Infrastructure.Extensions;
 using KesselRunFramework.Core.Infrastructure.Invariants;
 using KesselRunFramework.Core.Infrastructure.Messaging;
-using MediatR;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace KesselRunFramework.AspNet.Messaging.Pipelines
+namespace KesselRunFramework.AspNet.Messaging.Decorators
 {
-    public class BusinessValidationPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class BusinessValidationDecorator<TCommand, TResponse> : ICommandHandler<TCommand, TResponse>
+        where TCommand : ICommand<TResponse>
         where TResponse : class
-        where TRequest : IValidateable
     {
-        private readonly IValidator<TRequest> _compositeValidator;
-        private readonly ILogger<TRequest> _logger;
+        private readonly ICommandHandler<TCommand, TResponse> _decorator;
+        private readonly IValidator<TCommand> _compositeValidator;
+        private readonly ILogger<TCommand> _logger;
         private readonly ICurrentUser _currentUser;
         private readonly IActionContextAccessor _actionContextAccessor;
 
-        public BusinessValidationPipeline(
-            IValidator<TRequest> compositeValidator,
-            ILogger<TRequest> logger,
+        public BusinessValidationDecorator(
+            ICommandHandler<TCommand, TResponse> decorator,
+            IValidator<TCommand> compositeValidator,
+            ILogger<TCommand> logger,
             ICurrentUser currentUser,
-            IActionContextAccessor actionContextAccessor)
+            IActionContextAccessor actionContextAccessor
+            )
         {
+            _decorator = decorator;
             _compositeValidator = compositeValidator;
             _logger = logger;
             _currentUser = currentUser;
             _actionContextAccessor = actionContextAccessor;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+
+        public async Task<TResponse> ExecuteAsync(TCommand command, CancellationToken cancellationToken)
         {
             _logger.TraceBeforeValidatingMessage();
 
@@ -44,7 +49,7 @@ namespace KesselRunFramework.AspNet.Messaging.Pipelines
 
             if (responseType.Name.StartsWith(nameof(ValidateableResponse), StringComparison.Ordinal))
             {
-                var result = await _compositeValidator.ValidateAsync(request, cancellationToken);
+                var result = await _compositeValidator.ValidateAsync(command, cancellationToken);
 
                 if (!result.IsValid)
                 {
@@ -83,10 +88,12 @@ namespace KesselRunFramework.AspNet.Messaging.Pipelines
 
                 _logger.TraceMessageValidationPassed();
 
-                return await next();
+                return await _decorator.ExecuteAsync(command, cancellationToken);
             }
 
-            throw new Exception($"IValidateable implementation must be a {nameof(ValidateableResponse)}.");
+            _logger.TraceMessageValidationPassed();
+
+            return await _decorator.ExecuteAsync(command, cancellationToken);
         }
     }
 }

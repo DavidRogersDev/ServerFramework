@@ -1,4 +1,4 @@
-﻿namespace KesselRun.Web.Api.New
+﻿namespace KesselRunFramework.Core.Cqrs.Queries
 {
     public interface IQuery<T>
     {

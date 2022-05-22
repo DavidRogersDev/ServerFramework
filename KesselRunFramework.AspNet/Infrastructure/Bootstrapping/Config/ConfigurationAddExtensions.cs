@@ -48,7 +48,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config
                 
 
                 // Important for things like Http clients which are owned by the ServicesCollection but get
-                // injected into things like MediatR request handlers, which use SimpleInjector for its IOC needs. 
+                // injected into things like request handlers, which use SimpleInjector for its IOC needs. 
                 options.AutoCrossWireFrameworkComponents = true; 
 
                 //.AddViewComponentActivation()

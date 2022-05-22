@@ -1,13 +1,15 @@
-﻿using KesselRunFramework.AspNet.Response;
+﻿using KesselRun.Web.Api.Messaging.Commands;
+using KesselRunFramework.AspNet.Response;
+using KesselRunFramework.Core.Cqrs.Commands;
 using KesselRunFramework.Core.Infrastructure.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace KesselRun.Web.Api.New
+namespace KesselRun.Web.Api.Messaging.CommandHandlers
 {
-    public class RegisterNewUserHandler : ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>>
+    public class RegisterNewUserCommandHandler : ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>>
     {
-        
+
 
         public async Task<ValidateableResponse<ApiResponse<int>>> ExecuteAsync(RegisterNewUserCommand command, CancellationToken cancellationToken)
         {

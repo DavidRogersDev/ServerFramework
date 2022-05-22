@@ -1,9 +1,10 @@
 ﻿using KesselRunFramework.AspNet.Infrastructure.Invariants;
+using KesselRunFramework.Core.Cqrs.Commands;
 using Serilog.Context;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace KesselRun.Web.Api.New
+namespace KesselRunFramework.AspNet.Messaging.Decorators
 {
     public class LogContextDecorator<TCommand, TResponse> : ICommandHandler<TCommand, TResponse>
         where TCommand : ICommand<TResponse>

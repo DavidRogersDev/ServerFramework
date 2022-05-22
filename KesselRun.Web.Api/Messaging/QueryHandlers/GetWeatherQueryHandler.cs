@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using KesselRun.Business.DataTransferObjects.Weather;
 using KesselRun.Web.Api.HttpClients;
 using KesselRun.Web.Api.Messaging.Queries;
+using KesselRunFramework.Core.Cqrs.Queries;
 using KesselRunFramework.Core.Infrastructure.Http;
-using MediatR;
 
 namespace KesselRun.Web.Api.Messaging.QueryHandlers
 {
-    public class GetWeatherQueryHandler : IRequestHandler<GetWeatherQuery, WeatherDto>
+    public class GetWeatherQueryHandler : IQueryHandler<GetWeatherQuery, WeatherDto>
     {
         private readonly WeatherClient _weatherClient;
 
@@ -17,10 +17,12 @@ namespace KesselRun.Web.Api.Messaging.QueryHandlers
             _weatherClient = typedClientResolver.GetTypedClient<WeatherClient>();
         }
 
-        public async Task<WeatherDto> Handle(GetWeatherQuery request, CancellationToken cancellationToken)
+       
+
+        public async Task<WeatherDto> HandleAsync(GetWeatherQuery query, CancellationToken cancellationToken)
         {
-            _weatherClient.City = request.City;
-            _weatherClient.Units = request.Units;
+            _weatherClient.City = query.City;
+            _weatherClient.Units = query.Units;
 
             return await _weatherClient.GetWeather(cancellationToken);
         }

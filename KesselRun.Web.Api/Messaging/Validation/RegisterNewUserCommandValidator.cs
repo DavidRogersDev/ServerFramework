@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
-using KesselRun.Web.Api.New;
+using KesselRun.Web.Api.Messaging.Commands;
 using Constants = KesselRun.Business.Invariants;
 
 namespace KesselRun.Web.Api.Messaging.Validation

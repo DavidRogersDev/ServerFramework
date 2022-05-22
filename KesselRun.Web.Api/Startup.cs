@@ -5,18 +5,17 @@ using System.Reflection;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using KesselRun.Business.DataTransferObjects;
-using KesselRun.Business.Validation;
 using KesselRun.Web.Api.Infrastructure.Bootstrapping;
 using KesselRun.Web.Api.Infrastructure.Mapping;
-using KesselRun.Web.Api.New;
-using KesselRunFramework.AspNet.Infrastructure.ActionFilters;
-using KesselRunFramework.AspNet.Infrastructure.Bootstrapping;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc;
 using KesselRunFramework.AspNet.Infrastructure.HttpClient;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
-using KesselRunFramework.AspNet.Messaging.Pipelines;
+using KesselRunFramework.AspNet.Messaging.Decorators;
 using KesselRunFramework.AspNet.Middleware;
+using KesselRunFramework.Core.Cqrs.Commands;
+using KesselRunFramework.Core.Cqrs.Queries;
+using KesselRunFramework.Core.Infrastructure.Errors;
 using KesselRunFramework.Core.Infrastructure.Extensions;
 using KesselRunFramework.Core.Infrastructure.Http;
 using Microsoft.AspNetCore.Builder;
@@ -52,7 +51,7 @@ namespace KesselRun.Web.Api
                 .ConfigureApiBehaviorOptions(ApiBehaviourConfigurer.ConfigureApiBehaviour)
                 .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions)
                 .AddFluentValidation(fv => 
-                    fv.RegisterValidatorsFromAssemblyContaining<ColorCollectionValidator>(lifetime: ServiceLifetime.Singleton)
+                    fv.RegisterValidatorsFromAssemblies(new[] { Assemblies[StartUpConfig.Domain], Assemblies[StartUpConfig.Executing] } , lifetime: ServiceLifetime.Singleton)                    
                     );
 
             AppConfiguration = StartupConfigurer.GetAppConfiguration(Configuration);
@@ -121,32 +120,16 @@ namespace KesselRun.Web.Api
 
             Container.RegisterValidationAbstractions(new[] { Assemblies[StartUpConfig.Executing], Assemblies[StartUpConfig.Domain] });
             Container.RegisterAutomapperAbstractions(GetAutoMapperProfiles(Assemblies));
-            Container.RegisterMediatRAbstractions(new[] { Assemblies[StartUpConfig.Executing] }, GetTypesForPipeline(WebHostEnvironment));
             Container.RegisterApplicationServices(Assemblies[StartUpConfig.Domain], Configuration, "KesselRun.Business.ApplicationServices");
-        }
-
-        private static Type[] GetTypesForPipeline(IWebHostEnvironment webHostEnvironment)
-        {
-            return webHostEnvironment.IsDevelopmentOrIsStaging()
-                ? new[]
-                {
-                    typeof(OperationProfilingPipeline<,>), // not for Production
-                    typeof(LogContextPipeline<,>),
-                    typeof(BusinessValidationPipeline<,>)
-                }
-                : new[]
-                {
-                    typeof(LogContextPipeline<,>),
-                    typeof(BusinessValidationPipeline<,>)
-                };
         }
 
         private static IDictionary<string, Assembly> GetAssemblies()
         {
             var assemblies = new Dictionary<string, Assembly>(StringComparer.Ordinal)
             {
+                {StartUpConfig.Domain, typeof(RegisterUserPayloadDto).GetTypeInfo().Assembly },
                 {StartUpConfig.Executing, typeof(Startup).GetTypeInfo().Assembly},
-                {StartUpConfig.Domain, typeof(RegisterUserPayloadDto).GetTypeInfo().Assembly }
+                {StartUpConfig.FrameowrkCore, typeof(EventIDs).GetTypeInfo().Assembly},
             };
 
             // include any custom (domain) assemblies which will require scanning as part of the startup process.

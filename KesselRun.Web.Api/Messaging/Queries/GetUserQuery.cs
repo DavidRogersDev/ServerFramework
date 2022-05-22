@@ -1,9 +1,9 @@
 ﻿using KesselRun.Business.DataTransferObjects;
-using MediatR;
+using KesselRunFramework.Core.Cqrs.Queries;
 
 namespace KesselRun.Web.Api.Messaging.Queries
 {
-    public class GetUserQuery : IRequest<UserPayloadDto>
+    public class GetUserQuery : IQuery<UserPayloadDto>
     {
         public int UserId { get; set; }
     }

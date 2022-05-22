@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using KesselRun.Business.DataTransferObjects;
 using KesselRun.Web.Api.Controllers.V1_0;
 using KesselRun.Web.Api.Messaging.Commands;
-using KesselRun.Web.Api.New;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Controllers;
 using KesselRunFramework.AspNet.Infrastructure.Extensions;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
 using KesselRunFramework.AspNet.Response;
+using KesselRunFramework.Core.Cqrs.Commands;
 using KesselRunFramework.Core.Infrastructure.Messaging;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,16 +21,15 @@ namespace KesselRun.Web.Api.Controllers.V1._0
     [ApiVersion(Swagger.Versions.v1_0)]
     [Route(AspNet.Mvc.DefaultControllerTemplate)]
     [Produces(MediaTypeNames.Application.Json)]
-    public class RegisterUserController : AppApiMediatrController
+    public class RegisterUserController : AppApiController
     {
         private readonly ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>> handler;
 
         public RegisterUserController(
             ICurrentUser currentUser,
             ILogger logger,
-            ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>> handler,
-            IMediator mediator)
-            : base(currentUser, logger, mediator)
+            ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>> handler)
+            : base(currentUser)
         {
             this.handler = handler;
         }

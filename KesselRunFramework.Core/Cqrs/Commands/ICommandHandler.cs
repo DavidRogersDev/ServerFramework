@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace KesselRun.Web.Api.New
-{    
+namespace KesselRunFramework.Core.Cqrs.Commands
+{
     public interface ICommandHandler<in TCommand, TResponse>
         where TCommand : ICommand<TResponse>
     {

@@ -16,4 +16,9 @@
   <ItemGroup>
     <ProjectReference Include="..\KesselRunFramework.DataAccess\KesselRunFramework.DataAccess.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Cqrs\Commands\" />
+    <Folder Include="Cqrs\Queries\" />
+  </ItemGroup>
 </Project>
