@@ -1,7 +1,6 @@
 ﻿using System.Net.Mime;
 using System.Threading.Tasks;
 using KesselRun.Business.DataTransferObjects;
-using KesselRun.Web.Api.HttpClients;
 using KesselRun.Web.Api.Messaging.Commands;
 using KesselRun.Web.Api.Messaging.Queries;
 using KesselRunFramework.AspNet.Infrastructure;
@@ -20,12 +19,9 @@ namespace KesselRun.Web.Api.Controllers.V1._0
     [Produces(MediaTypeNames.Application.Json)]
     public class WeatherController : AppApiMediatrController
     {
-        private readonly RetryTestClient _retryTestClient;
-
-        public WeatherController(ICurrentUser currentUser, ILogger logger, IMediator mediator, RetryTestClient retryTestClient)
+        public WeatherController(ICurrentUser currentUser, ILogger logger, IMediator mediator)
             : base(currentUser, logger, mediator)
         {
-            _retryTestClient = retryTestClient;
         }
 
         [HttpGet]
@@ -38,33 +34,6 @@ namespace KesselRun.Web.Api.Controllers.V1._0
             var weather = await _mediator.Send(new GetWeatherQuery { City = weatherPayloadDto.City, Units = weatherPayloadDto.Units });
 
             return Ok(weather);
-        }
-
-        [HttpGet]
-        [Route(AspNet.Mvc.ActionTemplate)]
-        [MapToApiVersion(Swagger.Versions.v1_0)]
-        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RetryTest()
-        {
-            var weather = _retryTestClient.GetTestPayload();
-
-            return OkResponse(weather);
-        }
-
-        [HttpPost]
-        [Route(AspNet.Mvc.ActionTemplate)]
-        [MapToApiVersion(Swagger.Versions.v1_0)]
-        [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> TestInvalidModel(int id, string name)
-        {
-            var send = await _mediator.Send(new InvalidModelCommand
-            {
-                Id = id, Name = name
-            });
-
-            return OkResponse(send);
-        }
+        }                
     }
 }
