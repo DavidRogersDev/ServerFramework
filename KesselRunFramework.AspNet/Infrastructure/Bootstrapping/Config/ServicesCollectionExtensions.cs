@@ -26,9 +26,13 @@ namespace InControl.Framework.AspNet.Infrastructure.Bootstrapping.Config
                     )
                 );
             }
+            else
+            {
+                //  complete Cors config here for production
+            }
         }
 
-        public static void AddRedirect(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, int maxAge, int port = 443)
+        public static void AddRedirect(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, double maxAge, int port = 443)
         {
             var isProduction = webHostEnvironment.IsProduction();
 

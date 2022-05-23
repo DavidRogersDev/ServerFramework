@@ -9,15 +9,10 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc
 {
     public static class AppFrameworkRegistry
     {
-        public static void RegisterAspNetCoreAbstractions(this Container container)
-        {
-
-        }
-
         public static void RegisterValidationAbstractions(this Container container, IEnumerable<Assembly> validationAssemblies)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (validationAssemblies == null) throw new ArgumentNullException(nameof(validationAssemblies));
+            if (ReferenceEquals(container, null)) throw new ArgumentNullException(nameof(container));
+            if (ReferenceEquals(validationAssemblies, null)) throw new ArgumentNullException(nameof(validationAssemblies));
 
             container.Collection.Register(typeof(IValidator<>), validationAssemblies, Lifestyle.Singleton);
 

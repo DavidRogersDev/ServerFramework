@@ -3,8 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using KesselRun.Business.DataTransferObjects;
 using KesselRun.Business.DataTransferObjects.Weather;
-using KesselRun.Web.Api.HttpClients;
-using KesselRun.Web.Api.Messaging.Commands;
 using KesselRun.Web.Api.Messaging.Queries;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Controllers;
@@ -23,11 +21,8 @@ namespace KesselRun.Web.Api.Controllers.V1._0
     {
         private readonly IQueryHandler<GetWeatherQuery, WeatherDto> _queryHandler;
 
-        public WeatherController(
-            ICurrentUser currentUser,
-            IQueryHandler<GetWeatherQuery, WeatherDto> queryHandler,
-            IQueryHandler<InvalidModelCommand, string> invalidModelQueryHandler)
-            : base(currentUser)
+        public WeatherController(ICurrentUser currentUser, IQueryHandler<GetWeatherQuery, WeatherDto> queryHandler
+            ) : base(currentUser)
         {
             _queryHandler = queryHandler;
         }
@@ -38,13 +33,12 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetWeather([FromQuery]WeatherPayloadDto weatherPayloadDto)
+        public async Task<IActionResult> GetWeather([FromQuery] WeatherPayloadDto weatherPayloadDto)
         {
             var weather = await _queryHandler.HandleAsync(new GetWeatherQuery { City = weatherPayloadDto.City, Units = weatherPayloadDto.Units }, CancellationToken.None);
 
             return OkResponse(weather);
         }
 
-        
     }
 }

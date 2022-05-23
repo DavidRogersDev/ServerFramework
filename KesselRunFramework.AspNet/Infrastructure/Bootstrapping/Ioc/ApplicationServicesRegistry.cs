@@ -9,13 +9,11 @@ namespace KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc
 {
     public static class ApplicationServicesRegistry
     {
-        public static void RegisterApplicationServices(this Container container, Assembly assembly, IConfiguration configuration, string applicationServicesFullNs)
+        public static void RegisterApplicationServices(this Container container, Assembly assembly, IConfiguration configuration)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-            if (applicationServicesFullNs == null) throw new ArgumentNullException(nameof(applicationServicesFullNs));
-            if (applicationServicesFullNs.Trim().Equals(string.Empty)) throw new ArgumentException(nameof(applicationServicesFullNs) + " cannot be an empty string.");
 
             var applicationServicesInterface = typeof(IApplicationService);
             var applicationServicesInterfaceName = nameof(IApplicationService);

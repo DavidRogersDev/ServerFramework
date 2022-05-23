@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using KesselRun.Business.DataTransferObjects;
 
-namespace KesselRun.Business.Validation
+namespace KesselRun.Web.Api.Validation
 {
     public class RegisterUserPayloadDtoValidator : AbstractValidator<RegisterUserPayloadDto>
     {
