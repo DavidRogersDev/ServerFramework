@@ -4,7 +4,7 @@ using Serilog.Context;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace KesselRunFramework.AspNet.Messaging.Decorators
+namespace KesselRunFramework.AspNet.Messaging.CommandDecorators
 {
     public class LogContextDecorator<TCommand, TResponse> : ICommandHandler<TCommand, TResponse>
         where TCommand : ICommand<TResponse>

@@ -13,7 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace KesselRunFramework.AspNet.Messaging.Decorators
+namespace KesselRunFramework.AspNet.Messaging.CommandDecorators
 {
     public class BusinessValidationDecorator<TCommand, TResponse> : ICommandHandler<TCommand, TResponse>
         where TCommand : ICommand<TResponse>

@@ -6,7 +6,7 @@ using KesselRun.Business.ApplicationServices;
 using KesselRun.Web.Api.Infrastructure.Mapping;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
-using KesselRunFramework.AspNet.Messaging.Decorators;
+using KesselRunFramework.AspNet.Messaging.CommandDecorators;
 using KesselRunFramework.AspNet.Messaging.QueryDecorators;
 using KesselRunFramework.Core.Cqrs.Commands;
 using KesselRunFramework.Core.Cqrs.Queries;
