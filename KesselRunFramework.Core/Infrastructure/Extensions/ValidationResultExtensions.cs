@@ -1,15 +1,16 @@
 ﻿using FluentValidation.Results;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace KesselRunFramework.Core.Infrastructure.Extensions
 {
     public static class ValidationResultExtensions
     {
-        public static IDictionary<string, IEnumerable<string>> ToDictionary(this ValidationResult source, string prefix = null)
+        public static IReadOnlyDictionary<string, IReadOnlyList<string>> ToDictionary(this ValidationResult source, string prefix = null)
         {
-            return source.Errors
+            return new ReadOnlyDictionary<string, IReadOnlyList<string>>(source.Errors
                 .ToLookup(e => e.PropertyName, e => e.ErrorMessage, StringComparer.Ordinal)
                 .ToDictionary(
                     lookupKey => string.IsNullOrEmpty(prefix)
@@ -17,8 +18,8 @@ namespace KesselRunFramework.Core.Infrastructure.Extensions
                             : string.IsNullOrEmpty(lookupKey.Key)
                                 ? prefix
                                 : prefix + "." + lookupKey.Key,
-                    lookupCollection => lookupCollection.AsEnumerable()
-                );
+                    lookupCollection => (IReadOnlyList<string>)lookupCollection.ToList()
+                    ));
         }
     }
 }

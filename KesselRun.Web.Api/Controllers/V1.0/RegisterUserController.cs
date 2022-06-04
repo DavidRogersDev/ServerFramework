@@ -39,6 +39,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [MapToApiVersion(Swagger.Versions.v1_0)]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<string>>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> CreateUser([FromForm]RegisterUserPayloadDto dto)
         {
             var result = await handler.ExecuteAsync(new RegisterNewUserCommand

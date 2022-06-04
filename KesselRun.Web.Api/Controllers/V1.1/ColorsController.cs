@@ -11,10 +11,11 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using KesselRun.Business.DataTransferObjects;
 using KesselRunFramework.Core.Infrastructure.Validation;
-using FluentValidation.Results;
 using System.Threading;
 using KesselRunFramework.Core.Cqrs.Queries;
 using KesselRun.Web.Api.Messaging.Queries;
+using KesselRunFramework.Core.Infrastructure.Messaging;
+using KesselRunFramework.AspNet.Infrastructure.Extensions;
 
 namespace KesselRun.Web.Api.Controllers.V1._1
 {
@@ -23,12 +24,13 @@ namespace KesselRun.Web.Api.Controllers.V1._1
     [Produces(MediaTypeNames.Application.Json)]
     public class ColorsController : AppApiController
     {
-        private readonly IQueryHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidationResult>> _queryHandler;
+        private readonly IQueryHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidateableResponse>> _queryHandler;
 
         public ColorsController(
             ICurrentUser currentUser,
             ILogger logger,
-            IQueryHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidationResult>> queryHandler)
+            IQueryHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidateableResponse>> queryHandler
+            )
             : base(currentUser)
         {
             _queryHandler = queryHandler;
@@ -44,8 +46,8 @@ namespace KesselRun.Web.Api.Controllers.V1._1
             var colors = await _queryHandler.HandleAsync(new GetColorsQuery(), CancellationToken.None);
 
             return colors.Match(
-                result => OkResponse(colors.LeftOrDefault().Concat(new[] { new ColorPayloadDto { Color = "Yay for 1.1" } })),
-                error => BadRequestResponse(string.Empty, OperationOutcome.ValidationFailOutcome(colors.RightOrDefault().Errors.Select(e => e.ErrorMessage)))
+                    result => OkResponse(colors.LeftOrDefault().Concat(new[] { new ColorPayloadDto { Color = "Yay for 1.1" } })),
+                    error => colors.RightOrDefault().ToUnprocessableRequestResult()
                 );
         }
     }

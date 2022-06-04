@@ -3,9 +3,11 @@ using KesselRun.Business.DataTransferObjects;
 using KesselRun.Web.Api.Messaging.Queries;
 using KesselRunFramework.AspNet.Infrastructure;
 using KesselRunFramework.AspNet.Infrastructure.Controllers;
+using KesselRunFramework.AspNet.Infrastructure.Extensions;
 using KesselRunFramework.AspNet.Infrastructure.Invariants;
 using KesselRunFramework.AspNet.Response;
 using KesselRunFramework.Core.Cqrs.Queries;
+using KesselRunFramework.Core.Infrastructure.Messaging;
 using KesselRunFramework.Core.Infrastructure.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,12 +25,12 @@ namespace KesselRun.Web.Api.Controllers.V1._0
     [Produces(MediaTypeNames.Application.Json)]
     public class ColorsController : AppApiController
     {
-        private readonly IQueryHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidationResult>> _queryHandler;
+        private readonly IQueryHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidateableResponse>> _queryHandler;
 
         public ColorsController(
             ICurrentUser currentUser,
             ILogger logger,
-            IQueryHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidationResult>> queryHandler
+            IQueryHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidateableResponse>> queryHandler
             )
             : base(currentUser)
         {
@@ -46,7 +48,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
 
             return colors.Match(
                 result => OkResponse(colors.LeftOrDefault()), 
-                error => BadRequestResponse(string.Empty, OperationOutcome.ValidationFailOutcome(colors.RightOrDefault().Errors.Select(e => e.ErrorMessage)))                
+                error => colors.RightOrDefault().ToUnprocessableRequestResult()                
                 );
         }
     }
