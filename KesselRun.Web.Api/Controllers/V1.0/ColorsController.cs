@@ -38,7 +38,10 @@ namespace KesselRun.Web.Api.Controllers.V1._0
 
             return colors.Match(
                 result => OkResponse(colors.LeftOrDefault()), 
-                error => BadRequestResponse(string.Empty, OperationOutcome.ValidationFailOutcome(colors.RightOrDefault().Errors.Select(e => e.ErrorMessage)))                
+                error => BadRequestResponse(
+                    string.Empty, 
+                    OperationOutcome.ValidationFailOutcome(colors.RightOrDefault().ValidationFailures)
+                    )
                 );
         }
     }

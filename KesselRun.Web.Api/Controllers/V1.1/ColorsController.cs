@@ -38,8 +38,11 @@ namespace KesselRun.Web.Api.Controllers.V1._1
             var colors = await _mediator.Send(new GetColorsQuery());
 
             return colors.Match(
-                result => OkResponse(colors.LeftOrDefault().Concat(new []{ new ColorPayloadDto { Color = "Yay for 1.1"}})), 
-                error => BadRequestResponse(string.Empty, OperationOutcome.ValidationFailOutcome(colors.RightOrDefault().Errors.Select(e => e.ErrorMessage)))                
+                result => OkResponse(colors.LeftOrDefault()),
+                error => BadRequestResponse(
+                    string.Empty,
+                    OperationOutcome.ValidationFailOutcome(colors.RightOrDefault().ValidationFailures)
+                    )
                 );
         }
     }

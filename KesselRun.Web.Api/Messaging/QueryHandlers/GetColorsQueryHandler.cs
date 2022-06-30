@@ -1,4 +1,4 @@
-﻿using FluentValidation.Results;
+﻿using BusinessValidation;
 using KesselRun.Business.ApplicationServices;
 using KesselRun.Business.DataTransferObjects;
 using KesselRun.Web.Api.Messaging.Queries;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KesselRun.Web.Api.Messaging.QueryHandlers
 {
-    public class GetColorsQueryHandler : IRequestHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, ValidationResult>>
+    public class GetColorsQueryHandler : IRequestHandler<GetColorsQuery, Either<IEnumerable<ColorPayloadDto>, Validator>>
     {
         private readonly IColorsService _colorsService;
 
@@ -19,7 +19,7 @@ namespace KesselRun.Web.Api.Messaging.QueryHandlers
             _colorsService = colorsService;
         }
 
-        public async Task<Either<IEnumerable<ColorPayloadDto>, ValidationResult>> Handle(GetColorsQuery request, CancellationToken cancellationToken)
+        public async Task<Either<IEnumerable<ColorPayloadDto>, Validator>> Handle(GetColorsQuery request, CancellationToken cancellationToken)
         {
             return await _colorsService.GetColorsAsync();            
         }
