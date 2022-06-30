@@ -17,7 +17,7 @@ namespace KesselRunFramework.AspNet.Messaging.Pipelines
 {
     public class BusinessValidationPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TResponse : class
-        where TRequest : IValidateable
+        where TRequest : IRequest<TResponse>, IValidateable
     {
         private readonly IValidator<TRequest> _compositeValidator;
         private readonly ILogger<TRequest> _logger;

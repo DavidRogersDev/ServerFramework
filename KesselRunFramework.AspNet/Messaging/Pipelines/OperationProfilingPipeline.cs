@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace KesselRunFramework.AspNet.Messaging.Pipelines
 {
     public class OperationProfilingPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
     {
         private readonly ILogger _logger;
 

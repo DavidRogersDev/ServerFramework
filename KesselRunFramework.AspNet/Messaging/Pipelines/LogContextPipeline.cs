@@ -7,6 +7,7 @@ using Serilog.Context;
 namespace KesselRunFramework.AspNet.Messaging.Pipelines
 {
     public class LogContextPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
     {
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
