@@ -1,4 +1,4 @@
-﻿using FluentValidation.Results;
+﻿using BusinessValidation;
 using KesselRun.Business.DataTransferObjects;
 using KesselRunFramework.Core.Infrastructure.Validation;
 using System.Collections.Generic;
@@ -8,6 +8,6 @@ namespace KesselRun.Business.ApplicationServices
 {
     public interface IColorsService
     {
-        Task<Either<IEnumerable<ColorPayloadDto>, ValidationResult>> GetColorsAsync();
+        Task<Either<IEnumerable<ColorPayloadDto>, Validator>> GetColorsAsync();
     }
 }

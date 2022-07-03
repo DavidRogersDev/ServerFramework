@@ -1,26 +1,23 @@
 ﻿using AutoMapper;
-using FluentValidation;
-using FluentValidation.Results;
+using BusinessValidation;
 using KesselRun.Business.DataTransferObjects;
 using KesselRunFramework.Core;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Drawing;
 using KesselRunFramework.Core.Infrastructure.Validation;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace KesselRun.Business.ApplicationServices
 {
     public class ColorsService : ApplicationService, IColorsService
     {
-        private readonly IValidator<IEnumerable<ColorPayloadDto>> _colorValidator;
-
-        public ColorsService(IValidator<IEnumerable<ColorPayloadDto>> colorValidator, IMapper mapper)
+        public ColorsService(IMapper mapper)
             : base(mapper)
         {
-            _colorValidator = colorValidator;
         }
 
-        public async Task<Either<IEnumerable<ColorPayloadDto>, ValidationResult>> GetColorsAsync()
+        public async Task<Either<IEnumerable<ColorPayloadDto>, Validator>> GetColorsAsync()
         {
             // This example is a bit silly.
             // Here, for the purposes of this example, the business rule is that the collection of colors that
@@ -39,14 +36,14 @@ namespace KesselRun.Business.ApplicationServices
             /****************************** OPTION 2 ******************************/
             //var colorPayloadDtos = new List<ColorPayloadDto>(0);
 
+            var validator = new Validator();
 
+            validator.Validate("NoColors", "The color collection must contain at least one color.", colorPayloadDtos, c => c.Any());
 
-            var validationResult = await _colorValidator.ValidateAsync(colorPayloadDtos);
+            if (validator)
+                return await Task.FromResult(colorPayloadDtos);
 
-            if (validationResult.IsValid)
-                return colorPayloadDtos;
-
-            return validationResult;
+            return await Task.FromResult(validator);
         }
     }
 }

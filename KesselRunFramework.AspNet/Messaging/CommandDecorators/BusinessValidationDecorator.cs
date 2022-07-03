@@ -65,11 +65,7 @@ namespace KesselRunFramework.AspNet.Messaging.CommandDecorators
 
                     if (ReferenceEquals(resultType, null))
                     {
-                        var nonGenericInvalidResponse =
-                            Activator.CreateInstance(
-                                responseType,
-                                errorsCollated
-                                ) as TResponse;
+                        var nonGenericInvalidResponse = new ValidateableResponse(errorsCollated) as TResponse;
 
                         return nonGenericInvalidResponse;
                     }

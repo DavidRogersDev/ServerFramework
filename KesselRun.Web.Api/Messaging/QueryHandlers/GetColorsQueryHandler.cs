@@ -1,9 +1,7 @@
-﻿using FluentValidation.Results;
-using KesselRun.Business.ApplicationServices;
+﻿using KesselRun.Business.ApplicationServices;
 using KesselRun.Business.DataTransferObjects;
 using KesselRun.Web.Api.Messaging.Queries;
 using KesselRunFramework.Core.Cqrs.Queries;
-using KesselRunFramework.Core.Infrastructure.Extensions;
 using KesselRunFramework.Core.Infrastructure.Messaging;
 using KesselRunFramework.Core.Infrastructure.Validation;
 using System.Collections.Generic;
@@ -29,7 +27,7 @@ namespace KesselRun.Web.Api.Messaging.QueryHandlers
             if (result.RightOrDefault() is null)
                 return result.LeftOrDefault().ToList(); // call ToList() because for implicit casting to work, the type must be concrete i.e. can't just be IEnumerable<ColorPayloadDto>
 
-            return new ValidateableResponse(result.RightOrDefault().ToDictionary());
+            return new ValidateableResponse(result.RightOrDefault().ValidationFailures);
         }
     }
 }

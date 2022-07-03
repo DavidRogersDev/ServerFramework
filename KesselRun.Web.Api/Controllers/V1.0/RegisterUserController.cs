@@ -24,13 +24,16 @@ namespace KesselRun.Web.Api.Controllers.V1._0
     public class RegisterUserController : AppApiController
     {
         private readonly ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>> handler;
+        readonly ICommandHandler<RegisterNewUserCommand2, ValidateableResponse> handler2;
 
         public RegisterUserController(
             ICurrentUser currentUser,
             ILogger logger,
-            ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>> handler)
+            ICommandHandler<RegisterNewUserCommand, ValidateableResponse<ApiResponse<int>>> handler,
+            ICommandHandler<RegisterNewUserCommand2, ValidateableResponse> handler2)
             : base(currentUser)
         {
+            this.handler2 = handler2;
             this.handler = handler;
         }
 
