@@ -41,7 +41,7 @@ namespace KesselRun.Web.Api.Controllers.V1._0
         [Route(AspNet.Mvc.ActionTemplate)]
         [MapToApiVersion(Swagger.Versions.v1_0)]
         [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> GetColors()
         {
             var colors = await _queryHandler.HandleAsync(new GetColorsQuery(), CancellationToken.None);
