@@ -17,8 +17,7 @@ namespace KesselRun.Web.Api.Messaging.CommandHandlers
             _logger = logger;
         }
 
-        public async Task<ValidateableResponse<ApiResponse<int>>> Handle(RegisterNewUserCommand request,
-            CancellationToken cancellationToken)
+        public async Task<ValidateableResponse<ApiResponse<int>>> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken)
         {
             // normally there would be code here which calls a service to persist the new user.
             // For demo purposes, I will just return the Id of 10 for the new imaginary user.
@@ -29,8 +28,7 @@ namespace KesselRun.Web.Api.Messaging.CommandHandlers
                     {
                         Data = 10,
                         Outcome = OperationOutcome.SuccessfulOutcome
-                    }
-                    )
+                    })
                 );
         }
     }

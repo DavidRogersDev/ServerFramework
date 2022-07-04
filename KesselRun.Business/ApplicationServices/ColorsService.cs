@@ -38,12 +38,11 @@ namespace KesselRun.Business.ApplicationServices
 
             var validator = new Validator();
             validator.Validate("NoColors", "The color collection must contain at least one color.", colorPayloadDtos, c => c.Any());
-            //var validationResult = await _colorValidator.ValidateAsync(colorPayloadDtos);
 
             if (validator)
-                return colorPayloadDtos;
+                return await Task.FromResult(colorPayloadDtos);
 
-            return validator;
+            return await Task.FromResult(validator);
         }
     }
 }

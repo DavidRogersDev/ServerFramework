@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,11 +61,7 @@ namespace KesselRunFramework.AspNet.Messaging.Pipelines
 
                     if (ReferenceEquals(resultType, null))
                     {
-                        var nonGenericInvalidResponse =
-                            Activator.CreateInstance(
-                                responseType,
-                                errorsCollated
-                                ) as TResponse;
+                        var nonGenericInvalidResponse = new ValidateableResponse(errorsCollated) as TResponse;
 
                         return nonGenericInvalidResponse;
                     }

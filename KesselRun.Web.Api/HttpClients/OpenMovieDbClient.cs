@@ -48,7 +48,7 @@ namespace KesselRun.Web.Api.HttpClients
                     return await DeserializeAsync<TvShow>(stream);
                 }
             }
-            catch (Exception exception)
+            catch 
             {
                 if (statusCode == HttpStatusCode.InternalServerError)
                 {

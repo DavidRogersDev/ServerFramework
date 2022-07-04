@@ -7,7 +7,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
     public static class LoggingExtensions
     {
         private static readonly Action<ILogger, Exception> BeforeValidatingMessageTrace;
-        private static readonly Action<ILogger, IDictionary<string, IEnumerable<string>>, string, Exception> InvalidMessageTrace;
+        private static readonly Action<ILogger, IReadOnlyDictionary<string, IReadOnlyList<string>>, string, Exception> InvalidMessageTrace;
         private static readonly Action<ILogger, string, string, string, Exception> ModelBinderUsed;
         private static readonly Action<ILogger, long, Exception> ProfileMessagingTrace;
         private static readonly Action<ILogger, Exception> ValidMessageTrace;
@@ -29,7 +29,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
                 PipelineBehaviour + " Request took {milliseconds} milliseconds."
                 );
 
-            InvalidMessageTrace = LoggerMessage.Define<IDictionary<string, IEnumerable<string>>, string>(
+            InvalidMessageTrace = LoggerMessage.Define<IReadOnlyDictionary<string, IReadOnlyList<string>>, string>(
                 LogLevel.Debug,
                 new EventId((int)TraceEventIdentifiers.InValidMessageTrace, nameof(TraceMessageValidationFailed)),
                 PipelineBehaviour + " Invalid Message. {errors}. User: {user}"
@@ -53,7 +53,7 @@ namespace KesselRunFramework.AspNet.Infrastructure.Logging
             ProfileMessagingTrace(logger, milliseconds, null);
         }
 
-        public static void TraceMessageValidationFailed(this ILogger logger, IDictionary<string, IEnumerable<string>> errors, string user)
+        public static void TraceMessageValidationFailed(this ILogger logger, IReadOnlyDictionary<string, IReadOnlyList<string>> errors, string user)
         {
             InvalidMessageTrace(logger, errors, user, null);
         }
