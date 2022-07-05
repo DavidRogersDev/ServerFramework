@@ -17,7 +17,7 @@ namespace KesselRunFramework.AspNet.Messaging.CommandDecorators
 {
     public class BusinessValidationDecorator<TCommand, TResponse> : ICommandHandler<TCommand, TResponse>
         where TCommand : ICommand<TResponse>
-        where TResponse : class
+        where TResponse : ValidateableResponse
     {
         private readonly ICommandHandler<TCommand, TResponse> _decorator;
         private readonly IValidator<TCommand> _compositeValidator;
