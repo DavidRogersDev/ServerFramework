@@ -9,6 +9,7 @@ using KesselRunFramework.Core.Infrastructure.Messaging;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,7 +54,8 @@ namespace KesselRunFramework.AspNet.Messaging.CommandDecorators
 
                 if (!result.IsValid)
                 {
-                    var errorsCollated = result.ToDictionary();
+                    var errorsCollated = result.ToReadOnlyDictionary();
+                        
 
                     _logger.TraceMessageValidationFailed(errorsCollated, _currentUser?.UserName ?? GeneralPurpose.AnonymousUser);
 

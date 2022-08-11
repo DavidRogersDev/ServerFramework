@@ -8,12 +8,12 @@ namespace KesselRunFramework.DataAccess.Ops
 {
     public interface ISimpleListRetriever
     {
-        IEnumerable<ISimpleListItem> GetSimpleList(
+        IReadOnlyList<ISimpleListItem> GetSimpleList(
             string query,
             SqlParameter[] parameters = null,
             bool? withNullCheck = null
             );
-        Task<IEnumerable<ISimpleListItem>> GetSimpleListAsync(
+        Task<IReadOnlyList<ISimpleListItem>> GetSimpleListAsync(
             string query, 
             CancellationToken cancellationToken, 
             SqlParameter[] parameters = null,

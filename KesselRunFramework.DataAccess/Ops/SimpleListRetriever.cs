@@ -15,9 +15,10 @@ namespace KesselRunFramework.DataAccess.Ops
             _dbResolver = dbResolver;
         }
 
-        public IEnumerable<ISimpleListItem> GetSimpleList(string query, SqlParameter[] parameters = null, bool? withNullCheck = null)
+        public IReadOnlyList<ISimpleListItem> GetSimpleList(string query, SqlParameter[] parameters = null, bool? withNullCheck = null)
         {
-            var simpleList = new HashSet<ISimpleListItem>();
+            var simpleList = new List<ISimpleListItem>();
+
             using (var conn = _dbResolver.GetDbConnectionManager().GetOpenConnection())
             using (var dataReader = conn.ExecuteCommandQuery(query, parameters))
             {
@@ -52,9 +53,10 @@ namespace KesselRunFramework.DataAccess.Ops
         }
 
 
-        public async Task<IEnumerable<ISimpleListItem>> GetSimpleListAsync(string query, CancellationToken cancellationToken, SqlParameter[] parameters = null, bool? withNullCheck = null)
+        public async Task<IReadOnlyList<ISimpleListItem>> GetSimpleListAsync(string query, CancellationToken cancellationToken, SqlParameter[] parameters = null, bool? withNullCheck = null)
         {
-            var simpleList = new HashSet<ISimpleListItem>();
+            var simpleList = new List<ISimpleListItem>();
+
             using (var conn = _dbResolver.GetDbConnectionManager().GetOpenConnection())
             using (var dataReader = await conn.ExecuteCommandQueryAsync(query, cancellationToken, parameters))
             {

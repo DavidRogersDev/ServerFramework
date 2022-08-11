@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Data.SqlClient;
 using KesselRunFramework.AspNet.Response;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
 namespace KesselRunFramework.AspNet.Middleware
