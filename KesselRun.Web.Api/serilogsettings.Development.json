@@ -1,0 +1,28 @@
+{
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File", "KesselRunFramework.AspNet" ],
+    "MinimumLevel": {
+      "Default": "Verbose"
+    },
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": {
+          "restrictedToMinimumLevel": "Debug"
+        } 
+      },
+      {
+        "Name": "File",
+        "Args": {
+          "path": "Logs/apilog.log",
+          "fileSizeLimitBytes": 1073741824,
+          "formatter": "Serilog.Formatting.Json.JsonFormatter",
+          "retainedFileCountLimit": 30,
+          "rollingInterval": "Day",
+          "rollOnFileSizeLimit": true,
+          "restrictedToMinimumLevel": "Debug"
+        }
+      }
+    ]
+  }
+}

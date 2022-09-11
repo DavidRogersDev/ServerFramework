@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using InControl.Framework.AspNet.Infrastructure.Bootstrapping.Config;
 using KesselRun.Web.Api.Infrastructure.Bootstrapping;
 using KesselRun.Web.Api.Infrastructure.Ioc;
+using KesselRun.Web.Api.Validation;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Config;
 using KesselRunFramework.AspNet.Infrastructure.Bootstrapping.Ioc;
 using KesselRunFramework.AspNet.Infrastructure.HttpClient;
@@ -39,10 +41,10 @@ namespace KesselRun.Web.Api
         {
             services.AddControllers(MvcConfigurer.ConfigureMvcOptions)
                 .ConfigureApiBehaviorOptions(ApiBehaviourConfigurer.ConfigureApiBehaviour)
-                .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions)
-                .AddFluentValidation(fv =>
-                    fv.RegisterValidatorsFromAssemblies(new[] { Assemblies[StartUpConfig.Domain], Assemblies[StartUpConfig.Executing] }, lifetime: ServiceLifetime.Singleton)
-                    );
+                .AddJsonOptions(JsonOptionsConfigurer.ConfigureJsonOptions);
+
+            services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
+            services.AddValidatorsFromAssemblyContaining<RegisterUserPayloadDtoValidator>(ServiceLifetime.Singleton);
 
             var appConfiguration = StartupConfigurer.GetAppConfiguration(Configuration);
 
@@ -55,6 +57,7 @@ namespace KesselRun.Web.Api
             var httpClientTypes = Assemblies[StartUpConfig.Executing].GetExportedTypes()
                     .Where(t => t.IsClass && typeof(ITypedHttpClient).IsAssignableFrom(t));
 
+            services.AddApiKeyProvider(Configuration);
             services.RegisterTypedHttpClients(httpClientTypes);
 
             WebHostEnvironment = null; // not needed any longer. GC can cleanup.

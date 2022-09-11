@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection.PortableExecutable;
 using KesselRunFramework.AspNet.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -13,30 +14,24 @@ namespace KesselRun.Web.Api
     public class Program
     {
         internal static string BasePath = Directory.GetCurrentDirectory();
-        
+
+#if DEBUG
+        internal static string Environment = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", EnvironmentVariableTarget.Process);
+#else
+        internal static string Environment = "Production";
+#endif
+
         public static void Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(BasePath)
                 .AddJsonFile("serilogsettings.json")
+                .AddJsonFile($"serilogsettings.{Environment}.json")
                 .Build();
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
-            //Log.Logger = new LoggerConfiguration()
-            //    .Enrich.FromLogContext()
-            //    .Enrich.WithEventType()
-            //    .MinimumLevel.Debug()
-            //    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-            //    .WriteTo.Console()
-            //    .WriteTo.File(
-            //        new JsonFormatter(),
-            //        "apilog.log",
-            //        rollingInterval: RollingInterval.Day,
-            //        restrictedToMinimumLevel: LogEventLevel.Verbose
-            //        )
-            //    .CreateLogger();
 
             try
             {
@@ -58,7 +53,7 @@ namespace KesselRun.Web.Api
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>(); 
                 });
     }
 }

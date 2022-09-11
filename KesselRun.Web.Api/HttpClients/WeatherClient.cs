@@ -17,17 +17,19 @@ namespace KesselRun.Web.Api.HttpClients
     public class WeatherClient : TypedClientBase, ITypedHttpClient
     {
         private readonly ILogger _logger;
+        readonly ApiKeyProvider _apiKeyProvider;
         public string City { get; set; }
         public string Units { get; set; }
 
-        public WeatherClient(ILogger logger, HttpClient httpClient)
+        public WeatherClient(ILogger logger, HttpClient httpClient, ApiKeyProvider apiKeyProvider)
             : base(httpClient)
         {
+            _apiKeyProvider = apiKeyProvider;
             _logger = logger;
             HttpClient.BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/weather");
             UriBuilder = new UriBuilder(HttpClient.BaseAddress);
             QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
-            QueryStringParams["appid"] = "[add API id]"; // your app id goes here.
+            QueryStringParams["appid"] = _apiKeyProvider.OpenWeatherApiKey; // your app id goes here.
         }
 
         public async Task<WeatherDto> GetWeather(CancellationToken cancellationToken)

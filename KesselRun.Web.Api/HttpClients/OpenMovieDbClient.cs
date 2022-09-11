@@ -1,29 +1,28 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
-using KesselRun.Business.DataTransferObjects.Media;
-using KesselRunFramework.AspNet.Infrastructure.Bootstrapping;
+﻿using KesselRun.Business.DataTransferObjects.Media;
 using KesselRunFramework.AspNet.Infrastructure.HttpClient;
-using KesselRunFramework.Core.Infrastructure.Extensions;
 using KesselRunFramework.Core.Infrastructure.Http;
 using KesselRunFramework.Core.Infrastructure.Validation;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web;
 
 namespace KesselRun.Web.Api.HttpClients
 {
     public class OpenMovieDbClient : TypedClientBase, ITypedHttpClient
     {
-        public OpenMovieDbClient(HttpClient httpClient)
+        readonly ApiKeyProvider _apiKeyProvider;
+        public OpenMovieDbClient(HttpClient httpClient, ApiKeyProvider apiKeyProvider)
             : base(httpClient)
         {
+            _apiKeyProvider = apiKeyProvider;
             HttpClient.BaseAddress = new Uri("https://www.omdbapi.com");
             UriBuilder = new UriBuilder(HttpClient.BaseAddress);
             QueryStringParams = HttpUtility.ParseQueryString(UriBuilder.Query);
-            QueryStringParams["apikey"] = "[api key]"; // your api key goes here.
+            QueryStringParams["apikey"] = _apiKeyProvider.OpenMovieDatabaseApiKey; // your api key goes here.
         }
 
 
